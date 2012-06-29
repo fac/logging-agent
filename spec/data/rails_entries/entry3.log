@@ -1,0 +1,22 @@
+Started GET "/invoices/3456" for 90.1.2.3 at 2012-03-04 00:01:22 +0000
+  Processing by InvoicesController#show as HTML
+  Parameters: {"id"=>"3456"}
+Finding company for subdomain [subdomain3]
+Rendered help/_extra_help.html.erb (0.3ms)
+Rendered help/_invoices_show.html.erb (0.5ms)
+Rendered shared/_flash.html.erb (0.1ms)
+Rendered invoices/_title_actions.html.erb (4.9ms)
+Rendered shared/_ec_status_info.html.erb (0.1ms)
+Rendered invoices/_invoice_item.html.erb (2.8ms)
+Rendered invoices/_invoice.html.erb (19.9ms)
+Rendered invoices/_invoice_content.html.erb (22.1ms)
+Rendered layouts/_head.html.erb (0.1ms)
+Rendered shared/_topnav.html.erb (2.3ms)
+Rendered shared/_nav_my_money.html.erb (4.0ms)
+Rendered shared/_nav_taxes.html.erb (2.2ms)
+Rendered shared/_main_navigation.html.erb (12.3ms)
+Rendered shared/_work_subnav.html.erb (2.1ms)
+Rendered invoices/_subnav.html.erb (2.2ms)
+Rendered invoices/show.html.erb within layouts/application (57.2ms)
+RequestCache: 0 hits out of 1 cache tests = 0% efficiency
+Completed 200 OK in 78ms (Views: 55.2ms | ActiveRecord: 65.5ms)

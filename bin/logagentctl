@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'daemons'
+
+Daemons.run File.expand_path('../logagentd', __FILE__), {
+  :dir_mode   => :system,
+  :backtrace  => true,
+  :log_dir    => "/var/log/logagent/",
+  :log_output => true
+}

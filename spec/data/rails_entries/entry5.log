@@ -1,0 +1,6 @@
+Started GET "/bank_accounts/1234/balance_history.csv" for 80.2.3.4 at 2012-03-04 00:01:23 +0000
+  Processing by BankAccountsController#balance_history as CSV
+  Parameters: {"id"=>"1234"}
+Finding company for subdomain [subdomain1]
+Read fragment views/views/company_15190:bank_account_1234_history_csv:u=1329194863.csv (1.1ms)
+Completed 200 OK in 12ms

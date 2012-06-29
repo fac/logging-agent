@@ -1,0 +1,9 @@
+Started POST "/sessions" for 80.12.3.4 at 2012-03-04 00:01:22 +0000
+  Processing by SessionsController#create as 
+  Parameters: {"utf8"=>"✓", "authenticity_token"=>"wcrVEyLHKJaN7tI8bBl9omr/3uYaG64qfWjlA/OUVVQ=", "email"=>"some@emailhere", "password"=>"[FILTERED]", "openid_identifier"=>"a slash \"\\\"", "commit"=>"Log in to your Account"}
+Finding company for subdomain [subdomain2]
+Logged in as some@emailhere
+Updated last access time for some@emailhere to 2012-03-04 00:01:23 UTC
+Updated last access via for some@emailhere to FreeAgent Application
+Redirected to https://subdomain2.freeagentcentral.com/
+Completed 302 Found in 28ms

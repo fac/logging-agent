@@ -1,0 +1,6 @@
+Started GET "/signup" for 90.1.2.3 at 2012-03-04 00:01:22 +0000
+  Processing by SignupController#index as HTML
+Rendered shared/_flash.html.erb (0.1ms)
+Rendered layouts/_head.html.erb (0.1ms)
+Rendered signup/index.html.erb within layouts/signup (5.0ms)
+Completed 200 OK in 6ms (Views: 5.5ms | ActiveRecord: 0.0ms)

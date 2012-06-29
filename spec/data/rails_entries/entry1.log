@@ -1,0 +1,6 @@
+Started GET "/invoices/1234/invoice_items/auto_complete_for_invoice_item_description?term=autocomplete+term&_=1330819280685" for 9.1.0.1 at 2012-03-04 00:01:22 +0000
+  Processing by InvoiceItemsController#auto_complete_for_invoice_item_description as JSON
+  Parameters: {"term"=>"The \"Term\"", "_"=>"1330819280685", "invoice_id"=>"1234"}
+Finding company for subdomain [subdomain5]
+Rendered inline template (0.5ms)
+Completed 200 OK in 12ms (Views: 0.9ms | ActiveRecord: 4.7ms)

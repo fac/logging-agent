@@ -1,0 +1,10 @@
+#!/usr/bin/env ruby
+
+require 'log_agent'
+
+EventMachine.epoll if EventMachine.epoll?
+EventMachine.kqueue = true if EventMachine.kqueue?
+
+EM.run {
+  eval(File.read("/etc/logagent.conf.rb")) if File.exist?("/etc/logagent.conf.rb")
+}
