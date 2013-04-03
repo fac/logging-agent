@@ -13,7 +13,7 @@ describe LogAgent::Input::Base do
   end
 
   it "should have a sink accessor" do
-    input.sink.should == mock_sink
+    input.sink.should == [mock_sink]
   end
   
   it "should call the sink's << method when an event is emitted" do
