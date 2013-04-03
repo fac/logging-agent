@@ -19,6 +19,7 @@ module LogAgent
     autoload 'Grep',             'log_agent/filter/grep'
     autoload 'MultilineMessage', 'log_agent/filter/multiline_message'
     autoload 'Rails',            'log_agent/filter/rails'
+    autoload 'Barnyard',         'log_agent/filter/barnyard'
   end
   module Output
     autoload 'ElasticsearchRiver', 'log_agent/output/elasticsearch_river'

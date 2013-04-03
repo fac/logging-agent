@@ -1,0 +1,1 @@
+03/22-12:43:34.800458  [**] [3:19187:2] BAD-TRAFFIC TMG Firewall Client long host entry exploit attempt [**] [Classification: Attempted User Privilege Gain] [Priority: 1] {UDP} 192.168.1.2:53 -> 10.0.1.2:59788
