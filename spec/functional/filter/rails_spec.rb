@@ -12,7 +12,7 @@ describe LogAgent::Filter::Rails do
   let(:filter) { LogAgent::Filter::Rails.new sink }
   
   it "should be created with new <sink>" do
-    filter.sink.should == sink
+    filter.sink.should == [sink]
   end
 
   describe "parsing" do

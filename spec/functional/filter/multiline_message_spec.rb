@@ -5,7 +5,7 @@ describe LogAgent::Filter::MultilineMessage do
   
   it "should init with new( sink, options )" do
     filter = LogAgent::Filter::MultilineMessage.new sink, {:options => true}
-    filter.sink.should == sink
+    filter.sink.should == [sink]
     filter.options[:options].should be_true
   end
   

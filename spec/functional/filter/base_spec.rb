@@ -10,7 +10,7 @@ describe LogAgent::Filter::Base do
 
   describe "filter sink" do
     it "should have a #sink reader" do
-      filter.sink.should == mock_sink
+      filter.sink.should == [mock_sink]
     end
     it "should call the filter's sink method when emit is called" do
       mock_sink.should_receive(:<<).with("an_event_here")
