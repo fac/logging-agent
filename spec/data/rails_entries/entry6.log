@@ -1,4 +1,4 @@
-Started GET "/company/income_data.xml" for 90.1.2.3 at 2012-03-04 00:01:22 +0000
+Started GET "/company/income_data.xml" for 90.1.2.3 at
   Processing by CompaniesController#income_data as XML
 Finding company for subdomain [subdomain]
 Rendered companies/income_data.xml.builder (40.9ms)

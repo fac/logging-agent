@@ -12,7 +12,7 @@ describe LogAgent::Filter::Rails do
   let(:filter) { LogAgent::Filter::Rails.new sink }
   
   it "should be created with new <sink>" do
-    filter.sink.should == sink
+    filter.sink.should == [sink]
   end
 
   describe "parsing" do
@@ -26,6 +26,24 @@ describe LogAgent::Filter::Rails do
     it "should pass the entry through to the sink" do
       sink.should_receive(:<<).with(entry1)
       filter << entry1
+    end
+
+    it "should parse timestamps correctly" do
+      entry1.timestamp.utc.to_s.should == '2012-03-04 00:01:22 UTC'
+      entry2.timestamp.utc.to_s.should == '2012-03-04 00:01:22 UTC'
+      entry3.timestamp.utc.to_s.should == '2012-03-04 00:01:22 UTC'
+    end
+
+    it "should parse timestamps in different timezones" do
+      entry4.timestamp.utc.to_s.should == '2012-03-03 19:01:22 UTC'
+    end
+
+    it "should use the current time if log timestamp is invalid" do
+      entry5.timestamp.should be_within(1).of(Time.now)
+    end
+
+    it "should use the current time if log timestamp is absent" do
+      entry6.timestamp.should be_within(1).of(Time.now)
     end
     
     it "should parse the method" do
