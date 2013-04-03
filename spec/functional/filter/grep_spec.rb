@@ -5,7 +5,7 @@ describe LogAgent::Filter::Grep do
   
   it "should be created with new <sink>, /regexp/, opts={}" do
     filter = LogAgent::Filter::Grep.new sink, /regexp/, :options => true
-    filter.sink.should == sink
+    filter.sink.should == [sink]
     filter.regexp.should == /regexp/
     filter.options[:options].should be_true
   end
