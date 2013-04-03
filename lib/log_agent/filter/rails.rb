@@ -4,11 +4,14 @@ module LogAgent::Filter
     include LogAgent::LogHelper
     
     def << event
-      if event.message =~ /^Started ([^\s]+) \"([^\"]+)\" for (\d+\.\d+\.\d+\.\d+) at (\d+-\d+-\d+ \d+:\d+:\d+ \+\d+)/
+      if event.message =~ /^Started ([^\s]+) \"([^\"]+)\" for (\d+\.\d+\.\d+\.\d+)/
         event.fields['rails_method'] = $1
         event.fields['rails_request_path'] = $2
         event.fields['rails_remote_addr'] = $3 
-        event.timestamp = Time.parse($4)
+      end
+
+      if event.message =~ /^Started .* for .* at (\d+-\d+-\d+ \d+:\d+:\d+ \+\d+)/
+        event.timestamp = Time.parse($1) rescue Time.now
       end
 
       if event.message =~ /Processing by ([^#]+)#([^\s]+) as ([^\s]*)/
