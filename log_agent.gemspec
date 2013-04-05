@@ -25,8 +25,8 @@ Gem::Specification.new do |s|
     lib/log_agent/input/file_tail.rb
     lib/log_agent/input/syslog_server.rb
     lib/log_agent/output/amqp.rb
+    lib/log_agent/output/debug.rb
     lib/log_agent/output/elasticsearch_river.rb
-    lib/log_agent/output/null.rb
     lib/log_agent/version.rb
     log_agent.gemspec
     spec/data/logstash-event.json

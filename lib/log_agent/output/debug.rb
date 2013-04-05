@@ -1,5 +1,5 @@
 module LogAgent::Output
-  class Null
+  class Debug
     include LogAgent::LogHelper
     
     def initialize

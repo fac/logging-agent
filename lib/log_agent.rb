@@ -23,7 +23,7 @@ module LogAgent
   module Output
     autoload 'ElasticsearchRiver', 'log_agent/output/elasticsearch_river'
     autoload 'AMQP',               'log_agent/output/amqp'
-    autoload 'Null',               'log_agent/output/null'
+    autoload 'Debug',              'log_agent/output/debug'
   end
 
   module LogHelper
