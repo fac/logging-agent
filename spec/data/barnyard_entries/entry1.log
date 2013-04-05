@@ -1,0 +1,1 @@
+03/22-12:43:42.358834  [**] [129:14:1] stream5: TCP Timestamp is missing [**] [Classification: Potentially Bad Traffic] [Priority: 2] {TCP} 192.168.1.1:52828 -> 10.0.1.1

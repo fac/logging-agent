@@ -16,6 +16,7 @@ Gem::Specification.new do |s|
     bin/logagentd
     lib/log_agent.rb
     lib/log_agent/event.rb
+    lib/log_agent/filter/barnyard.rb
     lib/log_agent/filter/base.rb
     lib/log_agent/filter/grep.rb
     lib/log_agent/filter/multiline_message.rb
@@ -29,12 +30,18 @@ Gem::Specification.new do |s|
     lib/log_agent/version.rb
     log_agent.gemspec
     spec/data/logstash-event.json
+    spec/data/barnyard_entries/entry1.log
+    spec/data/barnyard_entries/entry2.log
+    spec/data/barnyard_entries/entry3.log
+    spec/data/barnyard_entries/entry4.log
+    spec/data/barnyard_entries/entry5.log
     spec/data/rails_entries/entry1.log
     spec/data/rails_entries/entry2.log
     spec/data/rails_entries/entry3.log
     spec/data/rails_entries/entry4.log
     spec/data/rails_entries/entry5.log
     spec/data/rails_entries/entry6.log
+    spec/functional/filter/barnyard_spec.rb
     spec/functional/filter/base_spec.rb
     spec/functional/filter/grep_spec.rb
     spec/functional/filter/multiline_message_spec.rb
@@ -51,12 +58,18 @@ Gem::Specification.new do |s|
   }
   s.test_files    = %w{
     spec/data/logstash-event.json
+    spec/data/barnyard_entries/entry1.log
+    spec/data/barnyard_entries/entry2.log
+    spec/data/barnyard_entries/entry3.log
+    spec/data/barnyard_entries/entry4.log
+    spec/data/barnyard_entries/entry5.log
     spec/data/rails_entries/entry1.log
     spec/data/rails_entries/entry2.log
     spec/data/rails_entries/entry3.log
     spec/data/rails_entries/entry4.log
     spec/data/rails_entries/entry5.log
     spec/data/rails_entries/entry6.log
+    spec/functional/filter/barnyard_spec.rb
     spec/functional/filter/base_spec.rb
     spec/functional/filter/grep_spec.rb
     spec/functional/filter/multiline_message_spec.rb
@@ -86,5 +99,6 @@ Gem::Specification.new do |s|
   
   s.add_development_dependency 'rspec'
   s.add_development_dependency 'evented-spec'
+  s.add_development_dependency 'timecop'
 end
 
