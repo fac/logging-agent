@@ -5,6 +5,8 @@ require 'log_agent'
 EventMachine.epoll if EventMachine.epoll?
 EventMachine.kqueue = true if EventMachine.kqueue?
 
+config = ARGV[0] || '/etc/logagent.conf.rb'
+
 EM.run {
-  eval(File.read("/etc/logagent.conf.rb")) if File.exist?("/etc/logagent.conf.rb")
+  eval(File.read(config)) if File.exist?(config)
 }
