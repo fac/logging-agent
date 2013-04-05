@@ -1,12 +1,12 @@
+require 'time'
 module LogAgent::Filter
   class Barnyard < Base
 
     include LogAgent::LogHelper
 
     def << event
-
       if event.message =~ /^([0-9\-:\.\/]+)  \[\*\*\] \[([0-9]+):([0-9]+):([0-9]+)\] (.*) \[\*\*\] \[Classification(| ID): (.*)\] \[Priority(| ID): (.*?)\] {(.*?)} ([0-9\.:]+) -> ([0-9\.:]+)$/
-        event.timestamp = Time.parse($1) rescue Time.now
+        event.timestamp = Time.parse("#{$1} UTC") rescue Time.now
         event.fields['barnyard_gen_id']    = $2.to_i
         event.fields['barnyard_sig_id']    = $3.to_i
         event.fields['barnyard_sig_rev']   = $4.to_i
@@ -20,7 +20,7 @@ module LogAgent::Filter
         event.fields['barnyard_dest_port'] = $12.split(':')[1] ? $12.split(':')[1].to_i : nil
 
       elsif event.message =~ /^([0-9\-:\.\/]+)  \[\*\*\] \[([0-9]+):([0-9]+):([0-9]+)\] (.*) \[\*\*\] $/
-        event.timestamp = Time.parse($1) rescue Time.now
+        event.timestamp = Time.parse("#{$1} UTC") rescue Time.now
         event.fields['barnyard_gen_id']  = $2.to_i
         event.fields['barnyard_sig_id']  = $3.to_i
         event.fields['barnyard_sig_rev'] = $4.to_i

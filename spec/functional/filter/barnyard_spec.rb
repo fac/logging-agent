@@ -22,14 +22,22 @@ describe LogAgent::Filter::Barnyard do
     end
     
     it 'should parse the timestamp correctly' do
-      Timecop.freeze(Time.local(2013, 03, 01, 00, 00, 00)) do
-        # Ignore the tz offset as that will be taken from the local tz.
-        entry1.timestamp.to_s.should =~ /2013-03-22 12:43:42 \+\d\d\d\d/
-        entry2.timestamp.to_s.should =~ /2013-03-22 12:43:34 \+\d\d\d\d/
-        entry3.timestamp.to_s.should =~ /2013-04-02 11:18:04 \+\d\d\d\d/
-        entry5.timestamp.to_s.should =~ /2013-03-22 01:24:25 \+\d\d\d\d/
+      Timecop.freeze(Time.local(2013, 04, 01, 00, 00, 00)) do
+        entry1.timestamp.to_s.should =~ /^2013-03-22 12:43:42/
+        entry2.timestamp.to_s.should =~ /^2013-03-22 12:43:34/
+        entry3.timestamp.to_s.should =~ /^2013-04-02 11:18:04/
+        entry5.timestamp.to_s.should =~ /^2013-03-22 01:24:25/
       end
     end
+
+    it "should parse the timestamp as UTC" do
+      Timecop.freeze(Time.local(2013, 04, 01, 00, 00, 00)) do
+        entry1.timestamp.zone.should == "UTC"
+        entry2.timestamp.zone.should == "UTC"
+        entry3.timestamp.zone.should == "UTC"
+        entry5.timestamp.zone.should == "UTC"
+      end
+    end 
 
     it 'should use the current time if log timestamp is invalid' do
       Timecop.freeze do
