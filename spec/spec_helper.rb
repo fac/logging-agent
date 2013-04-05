@@ -8,5 +8,6 @@ Bundler.require
 require 'evented-spec'
 require 'eventmachine'
 require 'amqp'
+require 'timecop'
 
 require 'log_agent'

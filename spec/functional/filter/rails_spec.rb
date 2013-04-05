@@ -27,6 +27,28 @@ describe LogAgent::Filter::Rails do
       sink.should_receive(:<<).with(entry1)
       filter << entry1
     end
+
+    it "should parse timestamps correctly" do
+      entry1.timestamp.utc.to_s.should == '2012-03-04 00:01:22 UTC'
+      entry2.timestamp.utc.to_s.should == '2012-03-04 00:01:22 UTC'
+      entry3.timestamp.utc.to_s.should == '2012-03-04 00:01:22 UTC'
+    end
+
+    it "should parse timestamps in different timezones" do
+      entry4.timestamp.utc.to_s.should == '2012-03-03 19:01:22 UTC'
+    end
+
+    it "should use the current time if log timestamp is invalid" do
+      Timecop.freeze do
+        entry5.timestamp.should == Time.now
+      end
+    end
+
+    it "should use the current time if log timestamp is absent" do
+      Timecop.freeze do
+        entry6.timestamp.should == Time.now
+      end
+    end
     
     it "should parse the method" do
       entry1.fields['rails_method'].should == 'GET'

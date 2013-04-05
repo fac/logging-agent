@@ -38,6 +38,7 @@ GEM
       diff-lcs (~> 1.1.2)
     rspec-mocks (2.8.0)
     systemu (2.5.0)
+    timecop (0.6.1)
     uuid (2.3.5)
       macaddr (~> 1.0)
 
@@ -48,3 +49,4 @@ DEPENDENCIES
   evented-spec
   log_agent!
   rspec
+  timecop
