@@ -39,11 +39,15 @@ describe LogAgent::Filter::Rails do
     end
 
     it "should use the current time if log timestamp is invalid" do
-      entry5.timestamp.should be_within(1).of(Time.now)
+      Timecop.freeze
+      entry5.timestamp.should == Time.now
+      Timecop.return
     end
 
     it "should use the current time if log timestamp is absent" do
-      entry6.timestamp.should be_within(1).of(Time.now)
+      Timecop.freeze
+      entry6.timestamp.should == Time.now
+      Timecop.return
     end
     
     it "should parse the method" do
