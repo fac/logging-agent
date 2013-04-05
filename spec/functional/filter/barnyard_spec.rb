@@ -27,6 +27,17 @@ describe LogAgent::Filter::Barnyard do
       filter << entry1
     end
     
+    it 'should parse the timestamp correctly' do
+      entry1.timestamp.to_s.should =~ /#{Time.now.year}-03-22 12:43:42 \+\d\d\d\d/
+      entry2.timestamp.to_s.should =~ /#{Time.now.year}-03-22 12:43:34 \+\d\d\d\d/
+      entry3.timestamp.to_s.should =~ /#{Time.now.year}-04-02 11:18:04 \+\d\d\d\d/
+      entry5.timestamp.to_s.should =~ /#{Time.now.year}-03-22 01:24:25 \+\d\d\d\d/
+    end
+
+    it 'should use the current time if log timestamp is invalid' do
+      entry4.timestamp.should be_within(1).of(Time.now)
+    end
+
     it 'should parse the generator id' do
       entry1.fields['barnyard_gen_id'].should == 129
       entry2.fields['barnyard_gen_id'].should == 3
