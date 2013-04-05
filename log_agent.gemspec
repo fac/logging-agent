@@ -19,7 +19,6 @@ Gem::Specification.new do |s|
     lib/log_agent/filter/barnyard.rb
     lib/log_agent/filter/base.rb
     lib/log_agent/filter/grep.rb
-    lib/log_agent/filter/barnyard.rb
     lib/log_agent/filter/multiline_message.rb
     lib/log_agent/filter/rails.rb
     lib/log_agent/input/amqp.rb
