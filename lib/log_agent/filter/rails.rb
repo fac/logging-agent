@@ -10,6 +10,10 @@ module LogAgent::Filter
         event.fields['rails_remote_addr'] = $3 
       end
 
+      if event.message =~ /^Started .* for .* at (\d+-\d+-\d+ \d+:\d+:\d+ \+\d+)/
+        event.timestamp = Time.parse($1) rescue Time.now
+      end
+
       if event.message =~ /Processing by ([^#]+)#([^\s]+) as ([^\s]*)/
         event.fields['rails_controller'] = $1
         event.fields['rails_action'] = $2

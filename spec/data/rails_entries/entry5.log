@@ -1,4 +1,4 @@
-Started GET "/bank_accounts/1234/balance_history.csv" for 80.2.3.4 at 2012-03-04 00:01:23 +0000
+Started GET "/bank_accounts/1234/balance_history.csv" for 80.2.3.4 at 0000-00-00 00:00:00 +0000
   Processing by BankAccountsController#balance_history as CSV
   Parameters: {"id"=>"1234"}
 Finding company for subdomain [subdomain1]
