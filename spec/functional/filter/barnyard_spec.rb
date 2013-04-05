@@ -1,12 +1,6 @@
 # coding: utf-8
 require 'spec_helper'
 
-def log_fixture(name)
-  LogAgent::Event.new({
-    :message => File.read(File.expand_path("../../../data/barnyard_entries/#{name}.log", __FILE__))
-  })
-end
-
 describe LogAgent::Filter::Barnyard do
   let(:sink) { mock('MySinkObject', :<< => nil) }
   let(:filter) { LogAgent::Filter::Barnyard.new sink }
@@ -16,11 +10,11 @@ describe LogAgent::Filter::Barnyard do
   end
 
   describe 'parsing' do
-    let(:entry1) { log_fixture('entry1').tap { |e| filter << e } }
-    let(:entry2) { log_fixture('entry2').tap { |e| filter << e } }
-    let(:entry3) { log_fixture('entry3').tap { |e| filter << e } }
-    let(:entry4) { log_fixture('entry4').tap { |e| filter << e } }
-    let(:entry5) { log_fixture('entry5').tap { |e| filter << e } }
+    let(:entry1) { log_fixture('barnyard_entries/entry1').tap { |e| filter << e } }
+    let(:entry2) { log_fixture('barnyard_entries/entry2').tap { |e| filter << e } }
+    let(:entry3) { log_fixture('barnyard_entries/entry3').tap { |e| filter << e } }
+    let(:entry4) { log_fixture('barnyard_entries/entry4').tap { |e| filter << e } }
+    let(:entry5) { log_fixture('barnyard_entries/entry5').tap { |e| filter << e } }
                       
     it 'should pass the entry through to the sink' do
       sink.should_receive(:<<).with(entry1)

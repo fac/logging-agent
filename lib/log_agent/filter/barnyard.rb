@@ -4,6 +4,7 @@ module LogAgent::Filter
     include LogAgent::LogHelper
 
     def << event
+
       if event.message =~ /^([0-9\-:\.\/]+)  \[\*\*\] \[([0-9]+):([0-9]+):([0-9]+)\] (.*) \[\*\*\] \[Classification(| ID): (.*)\] \[Priority(| ID): (.*?)\] {(.*?)} ([0-9\.:]+) -> ([0-9\.:]+)$/
         event.timestamp = Time.parse($1) rescue Time.now
         event.fields['barnyard_gen_id']    = $2.to_i

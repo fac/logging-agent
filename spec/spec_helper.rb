@@ -11,3 +11,11 @@ require 'amqp'
 require 'timecop'
 
 require 'log_agent'
+
+Dir[File.expand_path("../support/*.rb", __FILE__)].each { |f| require f }
+
+RSpec.configure do |c|
+
+  c.include FixtureLoading
+
+end
