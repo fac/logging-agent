@@ -200,6 +200,10 @@ describe LogAgent::Filter::Rails do
       entry5.fields['rails_login'].should be_nil
       entry6.fields['rails_login'].should be_nil
     end
+    it "should parse the session value" do
+      entry7.fields['rails_session'].should == "0fcd8dada61aa1327ecdda6ba70352c7"
+      entry6.fields['rails_session'].should be_nil
+    end
   end
 end
 
