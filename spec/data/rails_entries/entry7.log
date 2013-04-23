@@ -1,0 +1,16 @@
+Started DELETE "/attachments/1170935" for 1.2.3.4 at 2013-04-23 08:03:10 +0000
+Loaded session '0fcd8dada61aa1327ecdda6ba70352c7'
+  Processing by AttachmentsController#destroy as JSON
+  Parameters: {"id"=>"9999999"}
+Finding company for subdomain [integrity]
+[paperclip] Deleting attachments.
+[paperclip] deleting attachments/9999999/original.pdf
+[paperclip] deleting attachments/9999999/small.png
+[paperclip] deleting attachments/9999999/medium.png
+Rendered attachments/_form.html.erb (4.1ms)
+Rendered shared/_flash.html.erb (1.7ms)
+ActiveRecord: 6 SELECT queries
+ActiveRecord: 1 BEGIN queries
+ActiveRecord: 1 DELETE queries
+ActiveRecord: 1 COMMIT queries
+Completed 200 OK in 16429ms (Views: 7.2ms | ActiveRecord: 20.3ms)

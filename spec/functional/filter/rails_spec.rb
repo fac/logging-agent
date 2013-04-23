@@ -10,13 +10,11 @@ describe LogAgent::Filter::Rails do
   end
 
   describe "parsing" do
-    let(:entry1) { log_fixture('rails_entries/entry1').tap { |e| filter << e } }
-    let(:entry2) { log_fixture('rails_entries/entry2').tap { |e| filter << e } }
-    let(:entry3) { log_fixture('rails_entries/entry3').tap { |e| filter << e } }
-    let(:entry4) { log_fixture('rails_entries/entry4').tap { |e| filter << e } }
-    let(:entry5) { log_fixture('rails_entries/entry5').tap { |e| filter << e } }
-    let(:entry6) { log_fixture('rails_entries/entry6').tap { |e| filter << e } }
-                      
+    Dir.glob(File.expand_path("../../../data/rails_entries/*", __FILE__)) do |file|
+      file = File.basename(file, ".*")
+      let(file.intern) { log_fixture(File.join("rails_entries", file)).tap { |e| filter << e } }
+    end
+
     it "should pass the entry through to the sink" do
       sink.should_receive(:<<).with(entry1)
       filter << entry1
@@ -32,15 +30,46 @@ describe LogAgent::Filter::Rails do
       entry4.timestamp.utc.to_s.should == '2012-03-03 19:01:22 UTC'
     end
 
-    it "should use the current time if log timestamp is invalid" do
+    it "should use the current time less the duration if log timestamp is invalid" do
       Timecop.freeze do
-        entry5.timestamp.should == Time.now
+        entry5.timestamp.should == Time.now - (entry5.fields['rails_duration']['total'] / 1000)
       end
     end
 
     it "should use the current time if log timestamp is absent" do
       Timecop.freeze do
         entry6.timestamp.should == Time.now
+      end
+    end
+
+    # Rails unhelpfully doesn't log the timestamp with precision greater than a second
+    # so ordering of our logs goes a bit squiffy. So if there is a reasonable looking
+    # :captured_at field, then use that, as it will have a higher precision.
+    #
+    it "should use the captured_at field if it is within 1 second of the timestamp" do
+      Timecop.freeze(Time.parse('2012-03-04 00:01:22.12345 UTC')) do
+        entry1.timestamp.utc.to_f.should == 1330819282.1114502  # 0.12345 - 0.012
+      end
+    end
+
+    # If captured_at and timestamp disagree (i.e. we're reading old logs for some reason) then
+    # make do with the less precice, but more accurate, timestamp field.
+    it "should not use the captured_at field if it is outside 1 second of the rails timestamp" do
+      Timecop.freeze(Time.parse('2012-03-04 00:01:25.12345 UTC')) do
+        entry1.timestamp.utc.to_f.should == 1330819282.0
+      end
+    end
+
+    # If we have a Rails log entry that took longer than one second, then the recorded timestamp
+    # will be at the start of the request, but the captured_at at the end. Ensure we subtract the request duration
+    # from the captured_at field when estimating the timestamp!
+    it "should subtract the rails_duration from the captured_at field when estimating the precise timestamp" do
+      # rails timestamp is 2013-04-23 08:03:10 +0000
+      # duration is 16429ms
+      fake_capture_time = Time.parse("2013-04-23 08:03:26 +0000") #i.e., roughly 16 seconds in the future
+
+      Timecop.freeze(fake_capture_time) do
+        entry7.timestamp.should == fake_capture_time - (entry7.fields['rails_duration']['total'] / 1000)
       end
     end
     
