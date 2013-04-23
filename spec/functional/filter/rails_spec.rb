@@ -10,10 +10,7 @@ describe LogAgent::Filter::Rails do
   end
 
   describe "parsing" do
-    Dir.glob(File.expand_path("../../../data/rails_entries/*", __FILE__)) do |file|
-      file = File.basename(file, ".*")
-      let(file.intern) { log_fixture(File.join("rails_entries", file)).tap { |e| filter << e } }
-    end
+    load_entries!('rails_entries')
 
     it "should pass the entry through to the sink" do
       sink.should_receive(:<<).with(entry1)

@@ -10,12 +10,8 @@ describe LogAgent::Filter::Barnyard do
   end
 
   describe 'parsing' do
-    let(:entry1) { log_fixture('barnyard_entries/entry1').tap { |e| filter << e } }
-    let(:entry2) { log_fixture('barnyard_entries/entry2').tap { |e| filter << e } }
-    let(:entry3) { log_fixture('barnyard_entries/entry3').tap { |e| filter << e } }
-    let(:entry4) { log_fixture('barnyard_entries/entry4').tap { |e| filter << e } }
-    let(:entry5) { log_fixture('barnyard_entries/entry5').tap { |e| filter << e } }
-                      
+    load_entries!('barnyard_entries')
+
     it 'should pass the entry through to the sink' do
       sink.should_receive(:<<).with(entry1)
       filter << entry1

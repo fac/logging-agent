@@ -1,0 +1,5 @@
+** Alert 1366708323.11720175: - syslog,sshd,invalid_login,authentication_failed,
+2013 Apr 23 10:12:03 (web1.staging.freeagentcentral.net) any->/var/log/secure
+Rule: 5710 (level 5) -> 'Attempt to login using a non-existent user'
+Src IP: 218.6.224.125
+Apr 23 10:12:03 web1.staging.freeagentcentral.net sshd[11019]: Invalid user ts3 from 218.6.224.125
