@@ -204,6 +204,16 @@ describe LogAgent::Filter::Rails do
       entry7.fields['rails_session'].should == "0fcd8dada61aa1327ecdda6ba70352c7"
       entry6.fields['rails_session'].should be_nil
     end
+
+    it "should extract the number of queries" do
+      entry7.fields['rails_queries']['total'].should == 9
+      entry7.fields['rails_queries']['SELECT'].should == 6
+      entry7.fields['rails_queries']['BEGIN'].should == 1
+      entry7.fields['rails_queries']['DELETE'].should == 1
+      entry7.fields['rails_queries']['COMMIT'].should == 1
+
+      entry6.fields['rails_queries'].should == { "total" => 0 }
+    end
   end
 end
 

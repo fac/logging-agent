@@ -63,6 +63,13 @@ module LogAgent::Filter
       if event.message =~ /Loaded session '([a-zA-Z0-9]+)'/
         event.fields['rails_session'] = $1
       end
+
+      event.fields['rails_queries'] ||= { "total" => 0 }
+      event.message.scan(/ActiveRecord: (\d+) ([A-Za-z]+) queries/) do |count,verb|
+        count = count.to_i
+        event.fields['rails_queries'][verb] = count
+        event.fields['rails_queries']['total'] += count
+      end
       
       event.fields['rails_rendered'] = []
       event.message.scan(/Rendered (.+?) (?:within (.*) )?\(([\d.]+)ms\)/) do |match|
