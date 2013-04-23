@@ -179,10 +179,25 @@ describe LogAgent::Event, "behaviour" do
     it "should return an Event object" do
       loaded.should be_a(LogAgent::Event)
     end
+
+    it "should load the object even if @captured_at isn't present" do
+      Timecop.freeze do
+        payload = JSON.dump(JSON.load(event.to_payload).delete("@captured_at"))
+        LogAgent::Event.from_payload(payload).captured_at.should == Time.now
+      end
+    end
     
+    it "should load the object even if @timestamp isn't present" do
+      Timecop.freeze do
+        payload = JSON.dump(JSON.load(event.to_payload).delete("@timestamp"))
+        LogAgent::Event.from_payload(payload).timestamp.should == Time.now
+      end
+    end
+
     it "should load the @timestamp field" do
       loaded.timestamp.iso8601(6).should == event.timestamp.iso8601(6)
     end
+
     it "should load the @source_host field" do
       event
       Socket.stub!(:gethostname => "a.n.other.host")

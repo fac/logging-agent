@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    log_agent (1.1.0pre1)
+    log_agent (1.1.1pre1)
       amqp
       daemons
       eventmachine

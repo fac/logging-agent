@@ -71,8 +71,8 @@ module LogAgent
     def self.from_payload(json)
       data = JSON.load(json)
       new({
-        :timestamp    => Time.parse(data['@timestamp']),
-        :captured_at  => Time.parse(data['@captured_at']),
+        :timestamp    => (Time.parse(data['@timestamp']) rescue nil),
+        :captured_at  => (Time.parse(data['@captured_at']) rescue nil),
         :source_host  => data['@source_host'],
         :source_path  => data['@source_path'],
         :source_type  => data['@source_type'],
