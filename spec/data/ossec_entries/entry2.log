@@ -1,0 +1,4 @@
+** Alert 1366708196.11701120: - pam,syslog,
+2013 Apr 23 10:09:56 (rmq2-gc.integration.freeagentcentral.net) any->/var/log/secure
+Rule: 5502 (level 3) -> 'Login session closed.'
+Apr 23 10:09:54 rmq2-gc.integration.freeagentcentral.net su: pam_unix(su:session): session closed for user rabbitmq
