@@ -41,4 +41,9 @@ describe LogAgent::Filter::Ossec, "ossec filter" do
     entry2.fields['ossec_src_ip'].should be_nil
   end
 
+  it "should extract the username if available" do
+    entry1.fields['ossec_username'].should be_nil
+    entry2.fields['ossec_username'].should == 'replication'
+  end
+
 end

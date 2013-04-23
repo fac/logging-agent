@@ -24,6 +24,10 @@ module LogAgent::Filter
         event.fields['ossec_src_ip'] = $1
       end
 
+      if event.message =~ /User: (.+)$/
+        event.fields['ossec_username'] = $1
+      end
+
       time = event.timestamp.strftime("%H:%M:%S")
       if event.message =~ /#{time} \(([^\)]+)\)/
         event.fields['ossec_hostname'] = $1
