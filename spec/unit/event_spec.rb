@@ -12,6 +12,23 @@ describe LogAgent::Event, "behaviour" do
   })}
   let(:empty_event) { LogAgent::Event.new}
   
+  describe "captured_at" do
+    it "should default to Time.now" do
+      Timecop.freeze do
+        LogAgent::Event.new.captured_at.should == Time.now
+      end
+    end
+
+    it "should take the value specified on creation if present" do
+      LogAgent::Event.new(:captured_at => test_timestamp).captured_at.should == test_timestamp
+    end
+
+    it "should persist the captured_at value through the payload" do
+      LogAgent::Event.from_payload(LogAgent::Event.new(:captured_at => test_timestamp).to_payload).captured_at.should == test_timestamp
+    end
+
+  end
+
   describe "uuid" do
     it "should be generated on creation" do
       event.uuid.should_not be_nil

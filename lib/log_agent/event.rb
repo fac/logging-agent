@@ -5,11 +5,12 @@ module LogAgent
   class Event
     include LogAgent::LogHelper
     
-    attr_reader :source_type, :source_host, :source_path, :uuid
+    attr_reader :source_type, :source_host, :source_path, :uuid, :captured_at
     attr_accessor :tags, :fields
     attr_accessor :type, :message, :message_format, :timestamp
 
     def initialize opts={}
+      @captured_at = opts[:captured_at] || Time.now
       @uuid = opts[:uuid] || UUID.generate
       @type = opts[:type] || ""
       @source_type = opts[:source_type] || ""
@@ -55,6 +56,7 @@ module LogAgent
       debug "Dumping event '#{@uuid}' to payload:"
       JSON.dump({
         '@timestamp'    => self.timestamp.iso8601(6),
+        '@captured_at'  => self.captured_at.iso8601(6),
         '@source_type'  => self.source_type,
         '@source_host'  => self.source_host,
         '@source_path'  => self.source_path,
@@ -70,6 +72,7 @@ module LogAgent
       data = JSON.load(json)
       new({
         :timestamp    => Time.parse(data['@timestamp']),
+        :captured_at  => Time.parse(data['@captured_at']),
         :source_host  => data['@source_host'],
         :source_path  => data['@source_path'],
         :source_type  => data['@source_type'],
