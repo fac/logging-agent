@@ -1,3 +1,3 @@
 module LogAgent
-  VERSION = '1.1.1pre2'
+  VERSION = '1.1.2'
 end
