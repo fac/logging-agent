@@ -1,0 +1,3 @@
+server ts thread txn_id txn_time user hostname ip db tbl idx lock_type lock_mode wait_hold victim query
+localhost 2013-05-08T13:02:31 1334961 1297146036 0 myuser  10.0.0.63 mydb mytable_items index_mytable_items_on_mytable_id RECORD X w 1 UPDATE `mytable` SET `value` = 'some\r\nstuff' WHERE `mytable`.`id` = 2
+localhost 2013-05-08T13:02:31 1334965 1297145424 1 myuser  10.0.0.63 mydb mytable_items  TABLE AUTO-INC w 0 INSERT INTO mytable_items (mytable_id, price) VALUES (1, 0.99)
