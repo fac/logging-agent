@@ -21,6 +21,7 @@ module LogAgent
     autoload 'Rails',            'log_agent/filter/rails'
     autoload 'Barnyard',         'log_agent/filter/barnyard'
     autoload 'Ossec',            'log_agent/filter/ossec'
+    autoload 'PtDeadlock',       'log_agent/filter/pt_deadlock'
   end
   module Output
     autoload 'ElasticsearchRiver', 'log_agent/output/elasticsearch_river'
