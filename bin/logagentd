@@ -2,6 +2,9 @@
 
 require 'log_agent'
 
+# Make sure UTF-8 encoding is default in case LANG env var isn't set
+Encoding.default_external = Encoding::UTF_8 if RUBY_VERSION > '1.8.7'
+
 EventMachine.epoll if EventMachine.epoll?
 EventMachine.kqueue = true if EventMachine.kqueue?
 
