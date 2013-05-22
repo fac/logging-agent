@@ -22,6 +22,7 @@ module LogAgent
     autoload 'Barnyard',         'log_agent/filter/barnyard'
     autoload 'Ossec',            'log_agent/filter/ossec'
     autoload 'PtDeadlock',       'log_agent/filter/pt_deadlock'
+    autoload 'RubyLogFormatter', 'log_agent/filter/ruby_log_formatter'
   end
   module Output
     autoload 'ElasticsearchRiver', 'log_agent/output/elasticsearch_river'

@@ -23,6 +23,7 @@ Gem::Specification.new do |s|
     lib/log_agent/filter/multiline_message.rb
     lib/log_agent/filter/pt_deadlock.rb
     lib/log_agent/filter/rails.rb
+    lib/log_agent/filter/ruby_log_formatter.rb
     lib/log_agent/input/amqp.rb
     lib/log_agent/input/base.rb
     lib/log_agent/input/file_tail.rb
