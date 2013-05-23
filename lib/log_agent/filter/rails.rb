@@ -3,14 +3,6 @@ module LogAgent::Filter
     
     include LogAgent::LogHelper
 
-    attr_reader :options
-
-    def initialize sink, options={}
-      @options = options
-      @options[:parse_ts] = true unless @options.has_key? :parse_ts
-      super(sink)
-    end
-    
     def << event
       event.fields['rails_duration'] ||= {}
 
@@ -44,7 +36,7 @@ module LogAgent::Filter
         event.fields['rails_duration']['activerecord'] = $1.to_f
       end
 
-      if event.message =~ /^Started .* for .* at (\d+-\d+-\d+ \d+:\d+:\d+ \+\d+)/ && options[:parse_ts]
+      if event.message =~ /^Started .* for .* at (\d+-\d+-\d+ \d+:\d+:\d+ \+\d+)/ && event.timestamp == event.captured_at
         rails_timestamp = Time.parse($1) rescue event.captured_at
         rails_duration = event.fields['rails_duration']['total'] || 0
 
