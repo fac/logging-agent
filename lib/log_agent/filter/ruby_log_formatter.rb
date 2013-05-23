@@ -4,12 +4,11 @@ module LogAgent::Filter
     include LogAgent::LogHelper
 
     def << event
-      if event.message =~/^[A-Z], \[(.*) #[0-9]+\]  [A-Z]+ -- : /
+      if event.message =~/^[A-Z], \[(.*) #[0-9]+\]  [A-Z]+ -- : (.*)$/
         timestamp = Time.parse($1) rescue nil
+        event.message = $2
         event.timestamp = timestamp if timestamp
       end
-
-      event.message.sub!(/^[A-Z], \[.* #[0-9]+\]  [A-Z]+ -- : /, '')
       emit event
     end
   end
