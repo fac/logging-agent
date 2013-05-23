@@ -45,6 +45,7 @@ Gem::Specification.new do |s|
     spec/data/rails_entries/entry4.log
     spec/data/rails_entries/entry5.log
     spec/data/rails_entries/entry6.log
+    spec/data/ruby_log_formatter_entries/entry1.log
     spec/data/pt_deadlock_entries/entry1.log
     spec/data/pt_deadlock_entries/entry2.log
     spec/data/ossec_entries/entry1.log
@@ -55,6 +56,7 @@ Gem::Specification.new do |s|
     spec/functional/filter/grep_spec.rb
     spec/functional/filter/multiline_message_spec.rb
     spec/functional/filter/rails_spec.rb
+    spec/functional/filter/ruby_log_formatter_spec.rb
     spec/functional/filter/pt_deadlock_spec.rb
     spec/functional/input/amqp_spec.rb
     spec/functional/input/base_spec.rb
@@ -79,6 +81,7 @@ Gem::Specification.new do |s|
     spec/data/rails_entries/entry4.log
     spec/data/rails_entries/entry5.log
     spec/data/rails_entries/entry6.log
+    spec/data/ruby_log_formatter_entries/entry1.log
     spec/data/ossec_entries/entry1.log
     spec/data/ossec_entries/entry2.log
     spec/data/pt_deadlock_entries/entry1.log
@@ -89,6 +92,7 @@ Gem::Specification.new do |s|
     spec/functional/filter/grep_spec.rb
     spec/functional/filter/multiline_message_spec.rb
     spec/functional/filter/rails_spec.rb
+    spec/functional/filter/ruby_log_formatter_spec.rb
     spec/functional/filter/pt_deadlock_spec.rb
     spec/functional/input/amqp_spec.rb
     spec/functional/input/base_spec.rb
