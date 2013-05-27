@@ -28,6 +28,9 @@ describe LogAgent::Filter::RubyLogFormatter do
       end
     end
 
+    it "should use the timestamp as a better captured_at field" do
+      entry1.captured_at.should == entry1.timestamp
+    end
 
     it "should strip the prefix from the message" do
       entry1.message.should == 'Started GET "/" for 127.0.0.1 at 2013-05-21 12:02:46 +0100'

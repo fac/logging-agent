@@ -6,7 +6,7 @@ module LogAgent::Filter
     def << event
       if event.message =~/^[A-Z], \[(.*) #([0-9]+)\]  [A-Z]+ -- : (.*)$/
         event.timestamp = begin
-          Time.parse("#{$1} UTC")
+          event.captured_at = Time.parse("#{$1} UTC")
         rescue
           nil
         end

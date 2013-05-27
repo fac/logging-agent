@@ -5,9 +5,9 @@ module LogAgent
   class Event
     include LogAgent::LogHelper
     
-    attr_reader :source_type, :source_host, :source_path, :uuid, :captured_at
+    attr_reader :source_type, :source_host, :source_path, :uuid
     attr_accessor :tags, :fields
-    attr_accessor :type, :message, :message_format, :timestamp
+    attr_accessor :type, :message, :message_format, :timestamp, :captured_at
 
     def initialize opts={}
       @captured_at = opts[:captured_at] || Time.now
