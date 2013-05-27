@@ -1,3 +1,5 @@
+#!/usr/bin/env gem build
+
 $:.push File.expand_path("../lib", __FILE__)
 require "log_agent/version"
 
