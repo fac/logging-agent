@@ -17,17 +17,31 @@ describe LogAgent::Filter::RubyLogFormatter do
       filter << entry1
     end
 
-    it "should parse timestamps correctly with ms" do
-      # Set to be UTC here so tests pass irrespective of machine TZ
-      # as timestamp contains no offset
-      ENV['TZ'], old_tz = 'UTC', ENV['TZ']
-      entry1.timestamp.utc.strftime('%Y-%m-%d %H:%M:%S.%6N UTC').should == '2013-05-21 12:02:45.156196 UTC'
-      ENV['TZ'] = old_tz
+    it "should parse the milliseconds" do
+      ("%.6f" % (entry1.timestamp.to_f % 1.0)).should == "0.156196"
     end
 
-    it "should strip the timestamp from the message" do
+    it "should always parse the timestamp as UTC" do
+      # Since it's not specified, we presume the timestamp is UTC
+      fake_local_timezone("UTC-9") do
+        entry1.timestamp.strftime('%Y-%m-%d %H:%M:%S.%6N %z').should == '2013-05-21 12:02:45.156196 +0000'
+      end
+    end
+
+
+    it "should strip the prefix from the message" do
       entry1.message.should == 'Started GET "/" for 127.0.0.1 at 2013-05-21 12:02:46 +0100'
     end
+
+    it "should strip the prefix from the message even if the timestamp doesn't parse" do
+      entry2.message.should == 'Started GET "/" for 127.0.0.1 at 2013-05-21 12:02:46 +0100'
+    end
+
+    it "should extract the pid field" do
+      entry1.fields['pid'].should == "12132"
+      entry2.fields['pid'].should == "9987"
+    end
+
   end
 end
 
