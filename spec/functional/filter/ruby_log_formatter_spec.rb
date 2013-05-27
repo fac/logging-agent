@@ -20,8 +20,9 @@ describe LogAgent::Filter::RubyLogFormatter do
     it "should parse timestamps correctly with ms" do
       # Set to be UTC here so tests pass irrespective of machine TZ
       # as timestamp contains no offset
-      ENV['TZ'] = 'UTC'
+      ENV['TZ'], old_tz = 'UTC', ENV['TZ']
       entry1.timestamp.utc.strftime('%Y-%m-%d %H:%M:%S.%6N UTC').should == '2013-05-21 12:02:45.156196 UTC'
+      ENV['TZ'] = old_tz
     end
 
     it "should strip the timestamp from the message" do
