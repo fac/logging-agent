@@ -4,7 +4,7 @@ module LogAgent::Filter
     include LogAgent::LogHelper
 
     def << event
-      if event.message =~/^[A-Z], \[(.*) #([0-9]+)\]  [A-Z]+ -- : (.*)$/
+      if event.message =~/^[A-Z],\s*\[([0-9\-\:T\.]+)\s*#([0-9]+)\]\s*[A-Z]+ -- : (.*)$/
         event.timestamp = begin
           event.captured_at = Time.parse("#{$1} UTC")
         rescue

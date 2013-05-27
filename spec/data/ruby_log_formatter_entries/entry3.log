@@ -1,0 +1,1 @@
+D, [2013-05-27T16:02:34.254069 #10308] DEBUG -- : [req=43f662fb009b77d8e6e7a80e9c9d6f04]   Company Load (1.8ms)  SELECT `companies`.* FROM `companies` WHERE `companies`.`id` = 1 LIMIT 1

@@ -45,6 +45,9 @@ describe LogAgent::Filter::RubyLogFormatter do
       entry2.fields['pid'].should == "9987"
     end
 
+    it "should parse debug statements too (which have different whitespace!)" do
+      entry3.fields['pid'].should == "10308"
+    end
   end
 end
 
