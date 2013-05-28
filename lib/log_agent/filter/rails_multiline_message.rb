@@ -7,6 +7,8 @@ module LogAgent::Filter
     attr_reader :max_time, :max_size
     attr_reader :timer
 
+    COMPLETION_REGEXP = /^Completed /.freeze
+
     # Creates the filter
     #
     #   chain          - the next chain link to pass events to
@@ -23,40 +25,37 @@ module LogAgent::Filter
     def initialize(chain, request_id_tag='req', max_time=60, max_size=100 * 1024)
       @request_id_tag = request_id_tag
       @max_size = max_size
-      @max_time = max_time
+      # @max_time = max_time
 
       @current_request_id = nil
 
-      @completed_match = /^Completed /
-      super(chain, :start => /^Started /, :end => @completed_match, :max => max_size )
+      super(chain)  #, :start => /^Started /, :end => COMPLETION_REGEXP, :max => max_size )
+
+      @event = nil
     end
 
     def << event
+
       request_id, event.message = if event.message =~ /^\s*\[#{@request_id_tag}=([^\]]+)\] (.*)$/
         [$1, $2]
       else
         [nil, event.message]
       end
 
-      request_id = @current_request_id if request_id.nil? && !@current_request_id.nil?
+      request_id = @current_request_id if request_id.nil?
 
-      if request_id.nil?
-        super(event)
+      if request_id != @current_request_id
+        @event && emit(@event)
+
+        @event = event
+        @current_request_id = request_id
       else
-        if @current_request_id != request_id
-          @event && emit(@event)
-          @event = event
-          @current_request_id = request_id
-        else
-          @event = reduce([@event, event])
+        @event = reduce([@event,event])
+      end
 
-          # Should we quit early?
-          if event.message =~ @completed_match || @event.message.size >= max_size
-            emit(@event)
-            @event = nil
-            @current_request_id = nil
-          end
-        end
+      if @event.message =~ COMPLETION_REGEXP || @event.message.length >= @max_size
+        emit(@event)
+        @event = nil
       end
     end
 
@@ -64,6 +63,29 @@ module LogAgent::Filter
       event.fields['request_id'] = @current_request_id
       super(event)
     end
+
+    #   request_id = @current_request_id if request_id.nil? && !@current_request_id.nil?
+
+    #   if request_id.nil?
+    #     super(event)
+    #   else
+    #     if @current_request_id != request_id
+    #       @event && emit(@event)
+    #       @event = event
+    #       @current_request_id = request_id
+    #     else
+    #       @event = reduce([@event, event])
+
+    #       # Should we quit early?
+    #       if event.message =~ @completed_match || @event.message.size >= max_size
+    #         emit(@event)
+    #         @event = nil
+    #         @current_request_id = nil
+    #       end
+    #     end
+    #   end
+    # end
+
 
   end
 end

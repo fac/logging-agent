@@ -16,147 +16,95 @@ describe LogAgent::Filter::RailsMultilineMessage do
   let(:filter) { LogAgent::Filter::RailsMultilineMessage.new(sink, 'req', nil) }
 
 
-  describe "for messages with a pid and request id" do
+  describe "log-entries with [req=foobar] prefix" do
 
-    describe "simple message" do
-      before do
-        filter << LogAgent::Event.new(:message => "[req=12345] I'm the first line", :fields => {'pid' => 9999})
-        filter << LogAgent::Event.new(:message => "[req=12345] I'm the second line", :fields => {'pid' => 9999})
-
-        # The event will be emitted when the next event from the same pid is received
-        filter << LogAgent::Event.new(:message => "[req=23456] I'm the next request", :fields => {'pid' => 9999})
-      end
-
-      it "should concatenate events with the same request id" do
-        sink.events.size.should == 1
-      end
-
-      it "should reduce the messages and trim the request id" do
-        sink.events.first.message.should == "I'm the first line\nI'm the second line"
-      end
-
-      it "should set the request id on the outgoing message" do
-        sink.events.first.fields['rails_request_id'].should == "12345"
-      end
+    it "should buffer until a different request id is received" do
+      filter << LogAgent::Event.new(:message => '[req=1234] First line')
+      filter << LogAgent::Event.new(:message => '[req=1234] Second line')
+      sink.events.size.should == 0
     end
 
-    describe "demux between pids" do
+    describe "with some different requests received" do
       before do
-        filter << LogAgent::Event.new(:message => "[req=12345] First pid, first line", :fields => {'pid' => 9999})
-        filter << LogAgent::Event.new(:message => "[req=34567] Second pid, first line", :fields => {'pid' => 8888})
-        filter << LogAgent::Event.new(:message => "[req=12345] First pid, second line", :fields => {'pid' => 9999})
-        filter << LogAgent::Event.new(:message => "[req=34567] Second pid, second line", :fields => {'pid' => 8888})
+        filter << LogAgent::Event.new(:message => '[req=1234] First line')
+        filter << LogAgent::Event.new(:message => '[req=1234] Second line')
 
-        # The event will be emitted when the next event from the same pid is received
-        filter << LogAgent::Event.new(:message => "[req=23456] I'm the next request", :fields => {'pid' => 9999})
-        filter << LogAgent::Event.new(:message => "[req=45678] I'm the next request", :fields => {'pid' => 8888})
+        filter << LogAgent::Event.new(:message => '[req=2345] Another First line')
+        filter << LogAgent::Event.new(:message => '[req=2345] Another Second line')
+
+        # Fire in another event to get the old one to stop buffering
+        filter << LogAgent::Event.new(:message => '[req=3456] Second line')
       end
-
-      it "should demux the pids" do
+      it "should concatenate them into single events" do
         sink.events.size.should == 2
+        sink.events.first.message.should == "First line\nSecond line"
+        sink.events.last.message.should == "Another First line\nAnother Second line"
       end
 
-      it "should reduce both messages correctly" do
-        sink.events.first.tap do |first_pid|
-          first_pid.message.should == "First pid, first line\nFirst pid, second line"
-          first_pid.fields['pid'].should == 9999
-          first_pid.fields['rails_request_id'].should == '12345'
-        end
-        sink.events.last.tap do |second_pid|
-          second_pid.message.should == "Second pid, first line\nSecond pid, second line"
-          second_pid.fields['pid'].should == 8888
-          second_pid.fields['rails_request_id'].should == "34567"
-        end
+      it "should write the request id into the fields" do
+        sink.events.first.fields['request_id'].should == '1234'
+        sink.events.last.fields['request_id'].should == '2345'
       end
-
     end
 
-    it "should immediately dispatch an event when it matches /^Completed" do
-      filter << LogAgent::Event.new(:message => "[req=12345] First pid, first line", :fields => {'pid' => 9999})
-      filter << LogAgent::Event.new(:message => "[req=34567] Second pid, first line", :fields => {'pid' => 8888})
-      filter << LogAgent::Event.new(:message => "[req=12345] Completed first request", :fields => {'pid' => 9999})
-      filter << LogAgent::Event.new(:message => "[req=34567] Completed second request", :fields => {'pid' => 8888})
-
-      sink.events.size.should == 2
-      sink.events.last.message.should == "Second pid, first line\nCompleted second request"
+    it "should return immediately if the completion regexp matches" do
+      filter << LogAgent::Event.new(:message => '[req=1234] First line')
+      filter << LogAgent::Event.new(:message => '[req=1234] Completed first request')
+      sink.events.size.should == 1
+      sink.events.first.message.should == "First line\nCompleted first request"
+      sink.events.first.fields['request_id'].should == "1234"
     end
 
-    it "shouldn't blow up if there is a one-line Completed request" do
-      filter << LogAgent::Event.new(:message => "[req=34567] Completed second request", :fields => {'pid' => 8888})      
-      sink.events.first.message.should == "Completed second request"
+    it "should still buffer subsequent messages OK after a completion match" do
+      filter << LogAgent::Event.new(:message => '[req=1234] First line')
+      filter << LogAgent::Event.new(:message => '[req=1234] Completed first request')
+      filter << LogAgent::Event.new(:message => '[req=2345] Second request line')
+      filter << LogAgent::Event.new(:message => '[req=2345] Completed second request')
+      sink.events[1].message.should == "Second request line\nCompleted second request"
     end
 
-    describe "max-size parameter" do
+    it "should return immediately for a single line if it matches the completion match" do
+      filter << LogAgent::Event.new(:message => '[req=1234] Completed short line')
+      sink.events.size.should == 1
+    end
 
-      let(:filter) { LogAgent::Filter::RailsMultilineMessage.new(sink, 'req', nil, 10) }
+    describe "lines without a prefix (such as an exception)" do
+      it "should wrap them into the current requestion" do
+        filter << LogAgent::Event.new(:message => '[req=1234] First line')
+        filter << LogAgent::Event.new(:message => 'OH MY GOD')
+        filter << LogAgent::Event.new(:message => 'IT ALL BROKE')
 
-      it "should emit the combined event when the combined message exceeds the max-size" do
-        filter << LogAgent::Event.new(:message => "[req=12345] 123456", :fields => {'pid' => 9999})
-        filter << LogAgent::Event.new(:message => "[req=12345] 789012", :fields => {'pid' => 9999})
-        filter << LogAgent::Event.new(:message => "[req=12345] 345678", :fields => {'pid' => 9999})
-
-        sink.events.size.should == 1
-        sink.events.first.message.should == "123456\n789012"
-      end
-
-      it "shouldn't blow up if a completed line arrives after the max-size" do
-        filter << LogAgent::Event.new(:message => "[req=12345] First pid, first line", :fields => {'pid' => 9999})
-        filter << LogAgent::Event.new(:message => "[req=12345] Completed first request", :fields => {'pid' => 9999})
+        filter << LogAgent::Event.new(:message => '[req=2345] Another First line')
+        filter << LogAgent::Event.new(:message => '[req=2345] Completed Second line')
 
         sink.events.size.should == 2
-        sink.events.first.message.should == "First pid, first line"
-        sink.events.last.message.should == "Completed first request"
+        sink.events.first.message.should == "First line\nOH MY GOD\nIT ALL BROKE"
       end
-
-
     end
-
-    describe "max-time parameter" do
-      include EventedSpec::EMSpec
-
-      let(:filter) { LogAgent::Filter::RailsMultilineMessage.new(sink, 'req', 0.1) }
-
-      it "should emit the combined event afer max-time has elapsed" do
-        filter << LogAgent::Event.new(:message => "[req=12345] First pid, first line", :fields => {'pid' => 9999})
-
-        EM.add_timer(0.2) do
-          sink.events.size.should == 1
-          sink.events.first.message.should == "First pid, first line"
-          done
-        end
-      end
-      it "should reset the max-time counter after each new event is received" do
-        filter << LogAgent::Event.new(:message => "[req=12345] First pid, first line", :fields => {'pid' => 9999})
-        EM.add_timer(0.05) do
-          filter << LogAgent::Event.new(:message => "[req=12345] First pid, second line", :fields => {'pid' => 9999})
-        end
-        EM.add_timer(0.14) do
-          filter << LogAgent::Event.new(:message => "[req=12345] First pid, third line", :fields => {'pid' => 9999})
-        end
-        EM.add_timer(0.30) do
-          sink.events.size.should == 1
-          sink.events.first.message.should == "First pid, first line\nFirst pid, second line\nFirst pid, third line"
-          done
-        end
-      end
-
-      it "shouldn't blow up if a completed line arrives after the max-time" do
-        filter << LogAgent::Event.new(:message => "[req=12345] First pid, first line", :fields => {'pid' => 9999})
-        EM.add_timer(0.15) do
-          filter << LogAgent::Event.new(:message => "[req=12345] Completed first request", :fields => {'pid' => 9999})
-
-          sink.events.size.should == 2
-          sink.events.first.message.should == "First pid, first line"
-          sink.events.last.message.should == "Completed first request"
-          done
-        end
-
-      end
-
-    end
-
   end
 
+  describe "as soon as the message buffer length exceeds max-length" do
+    let(:filter) { LogAgent::Filter::RailsMultilineMessage.new(sink, 'req', nil, 10) }
+
+    it "should emit the buffer straight away" do
+      filter << LogAgent::Event.new(:message => '[req=1234] 12345')
+      filter << LogAgent::Event.new(:message => '[req=1234] 6789012')
+
+      sink.events.size.should == 1
+      sink.events.first.message.should == "12345\n6789012"
+    end
+
+    it "should still buffer subsequent messages" do
+      filter << LogAgent::Event.new(:message => '[req=1234] 12345')
+      filter << LogAgent::Event.new(:message => '[req=1234] 6789012')
+      filter << LogAgent::Event.new(:message => '[req=2345] 123')
+      filter << LogAgent::Event.new(:message => '[req=2345] 456')
+      filter << LogAgent::Event.new(:message => '[req=3456] Another')
+      sink.events.size.should == 2
+      sink.events[0].message.should == "12345\n6789012"
+      sink.events[1].message.should == "123\n456"
+    end
+  end
 
 end
 
