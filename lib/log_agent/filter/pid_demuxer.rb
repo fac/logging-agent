@@ -50,7 +50,7 @@ module LogAgent::Filter
     def << event
       pid = event.fields['pid']
       sink = chain_for_pid(pid)
-      sink << event
+      sink && sink << event
     end
 
   end

@@ -34,7 +34,7 @@ describe LogAgent::Filter::PidDemuxer do
       @block_calls = []
       @filter = LogAgent::Filter::PidDemuxer.new(sink) do |pid, sink|
         @block_calls << [pid, sink]
-        EventFilter.new(sink, "pid-object-#{pid}")
+        EventFilter.new(sink, "pid-object-#{pid}") unless pid == 9999
       end
 
       @filter << LogAgent::Event.new(:message => "pid1-message", :fields => {'pid' => 1234})
@@ -61,7 +61,11 @@ describe LogAgent::Filter::PidDemuxer do
       sink.events.last.tags.should include('pid-object-3456')
     end
 
-    it "should drop events when a nil value is returned from the block"
+    it "should drop events when a nil value is returned from the block" do
+      @filter << LogAgent::Event.new(:message => "pid1-message", :fields => {'pid' => 9999})
+      @filter << LogAgent::Event.new(:message => "pid1-message", :fields => {'pid' => 9999})
+      sink.events.size.should == 4
+    end
   end
 
   describe "pid cleanup" do
