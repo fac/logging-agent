@@ -14,7 +14,8 @@ end
 
 class StdoutPrinter
   def << event
-    puts "EVENT: #{event.message}"
+    puts "EVENT(#{event.fields['request_id']}): #{event.message}"
+    puts " ** "
   end
 end
 
@@ -22,8 +23,10 @@ end
 
 load(ARGV[0])
 
-until $stdin.eof?
+EM.run do
+  until $stdin.eof?
 
-  line = $stdin.readline
-  @chain << LogAgent::Event.new(:message => line)
+    line = $stdin.readline
+    @chain << LogAgent::Event.new(:message => line)
+  end
 end

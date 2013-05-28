@@ -49,11 +49,12 @@ module LogAgent::Filter
 
     # Public: The sink method, to receive events.
     def << event
-      pid = event.fields['pid']
-
-      sink = chain_for_pid(pid || @last_pid)
-      sink && sink << event
+      pid = event.fields['pid'] || @last_pid
       @last_pid = pid
+
+      sink = chain_for_pid(pid)
+      sink && sink << event
+      
     end
 
   end

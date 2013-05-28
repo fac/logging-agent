@@ -26,6 +26,8 @@ Gem::Specification.new do |s|
     lib/log_agent/filter/pt_deadlock.rb
     lib/log_agent/filter/rails.rb
     lib/log_agent/filter/ruby_log_formatter.rb
+    lib/log_agent/filter/rails_multiline_message.rb
+    lib/log_agent/filter/pid_demuxer.rb
     lib/log_agent/input/amqp.rb
     lib/log_agent/input/base.rb
     lib/log_agent/input/file_tail.rb
@@ -59,6 +61,8 @@ Gem::Specification.new do |s|
     spec/functional/filter/multiline_message_spec.rb
     spec/functional/filter/rails_spec.rb
     spec/functional/filter/ruby_log_formatter_spec.rb
+    spec/functional/filter/rails_multiline_message_spec.rb
+    spec/functional/filter/pid_demuxer_spec.rb
     spec/functional/filter/pt_deadlock_spec.rb
     spec/functional/input/amqp_spec.rb
     spec/functional/input/base_spec.rb
@@ -96,6 +100,8 @@ Gem::Specification.new do |s|
     spec/functional/filter/rails_spec.rb
     spec/functional/filter/ruby_log_formatter_spec.rb
     spec/functional/filter/pt_deadlock_spec.rb
+    spec/functional/filter/rails_multiline_message_spec.rb
+    spec/functional/filter/pid_demuxer_spec.rb
     spec/functional/input/amqp_spec.rb
     spec/functional/input/base_spec.rb
     spec/functional/input/file_tail_spec.rb
