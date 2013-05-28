@@ -13,7 +13,7 @@ describe LogAgent::Filter::RailsMultilineMessage do
   end
 
   let(:sink) { EventSink.new }
-  let(:filter) { LogAgent::Filter::RailsMultilineMessage.new(sink, 'req', nil) }
+  let(:filter) { LogAgent::Filter::RailsMultilineMessage.new(sink, 'req') }
 
 
   describe "log-entries with [req=foobar] prefix" do
@@ -84,7 +84,7 @@ describe LogAgent::Filter::RailsMultilineMessage do
   end
 
   describe "as soon as the message buffer length exceeds max-length" do
-    let(:filter) { LogAgent::Filter::RailsMultilineMessage.new(sink, 'req', nil, 10) }
+    let(:filter) { LogAgent::Filter::RailsMultilineMessage.new(sink, 'req', 10) }
 
     it "should emit the buffer straight away" do
       filter << LogAgent::Event.new(:message => '[req=1234] 12345')
@@ -104,6 +104,43 @@ describe LogAgent::Filter::RailsMultilineMessage do
       sink.events[0].message.should == "12345\n6789012"
       sink.events[1].message.should == "123\n456"
     end
+  end
+
+  describe "when a [req=value] isn't seen" do
+
+    it "should match requests based on Start and End regexps" do
+      filter << LogAgent::Event.new(:message => 'Started foobar')
+      filter << LogAgent::Event.new(:message => 'some value')
+      filter << LogAgent::Event.new(:message => 'Completed it')
+      filter << LogAgent::Event.new(:message => 'Started another')
+      filter << LogAgent::Event.new(:message => 'Completed it already')
+      sink.events.size.should == 2
+      sink.events[0].message.should == "Started foobar\nsome value\nCompleted it"
+      sink.events[1].message.should == "Started another\nCompleted it already"
+    end
+
+    it "should handle [req=value] suddenly appearing" do
+      filter << LogAgent::Event.new(:message => 'Started foobar')
+      filter << LogAgent::Event.new(:message => 'some value')
+      filter << LogAgent::Event.new(:message => 'Completed it')
+      filter << LogAgent::Event.new(:message => '[req=1234] Started another')
+      filter << LogAgent::Event.new(:message => '[req=1234] Completed it already')
+      sink.events.size.should == 2
+      sink.events[0].message.should == "Started foobar\nsome value\nCompleted it"
+      sink.events[1].message.should == "Started another\nCompleted it already"
+    end
+
+    it "should handle [req=value] stopping suddenly" do
+      filter << LogAgent::Event.new(:message => '[req=1234] Started foobar')
+      filter << LogAgent::Event.new(:message => '[req=1234] some value')
+      filter << LogAgent::Event.new(:message => '[req=1234] Completed it')
+      filter << LogAgent::Event.new(:message => 'Started another')
+      filter << LogAgent::Event.new(:message => 'Completed it already')
+      sink.events.size.should == 2
+      sink.events[0].message.should == "Started foobar\nsome value\nCompleted it"
+      sink.events[1].message.should == "Started another\nCompleted it already"
+    end
+
   end
 
 end
