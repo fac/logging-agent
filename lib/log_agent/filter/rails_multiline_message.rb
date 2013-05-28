@@ -6,7 +6,7 @@ module LogAgent::Filter
 
     class RequestState
       attr_reader :request_id
-      attr_reader :events
+      attr_reader :events, :message_length
       def initialize(filter, request_id, &emit_block)
         @request_id = request_id
         @emit_block = emit_block
@@ -19,11 +19,10 @@ module LogAgent::Filter
         reset_timer
         @message_length += event.message.size
         @events << event
-        emit! if @message_length >= @filter.max_size
       end
-      def emit!
+      def emit! reason=nil
         cancel_timer
-        @emit_block.call
+        @emit_block.call reason
       end
     private
       def cancel_timer
@@ -32,7 +31,7 @@ module LogAgent::Filter
       def reset_timer
         if @filter.max_time
           cancel_timer
-          @timer = EventMachine.add_timer(@filter.max_time, &method(:emit!))
+          @timer = EventMachine.add_timer(@filter.max_time) { emit! :timer_fired! }
         end
       end
     end
@@ -62,6 +61,7 @@ module LogAgent::Filter
     end
 
     def << event
+
       pid = event.fields['pid']
 
       request_id, event.message = if event.message =~ /^\s*\[#{@request_id_tag}=([^\]]+)\] (.+)$/
@@ -73,11 +73,10 @@ module LogAgent::Filter
       if @pids[pid] 
 
         if @pids[pid].request_id != request_id
-          @pids[pid].emit!
+          @pids[pid].emit! :next_request
         end
-        
       else
-        @pids[pid] ||= RequestState.new(self, request_id) do
+        @pids[pid] ||= RequestState.new(self, request_id) do |reason|
           # this gets called either when #emit! is called directly, or
           # when the idle timer, or max-size counter fire.
           reduce_and_emit(@pids.delete(pid))
@@ -86,8 +85,8 @@ module LogAgent::Filter
 
       @pids[pid] && @pids[pid] << event
 
-      if event.message =~ /^Completed /
-        @pids[pid].emit!
+      if (@pids[pid] && @pids[pid].message_length > @max_size) || event.message =~ /^Completed /
+        @pids[pid].emit! :completed_matched
       end
     end
 

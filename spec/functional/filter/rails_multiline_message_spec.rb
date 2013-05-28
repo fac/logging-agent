@@ -99,6 +99,16 @@ describe LogAgent::Filter::RailsMultilineMessage do
         sink.events.first.message.should == "123456\n789012"
       end
 
+      it "shouldn't blow up if a completed line arrives after the max-size" do
+        filter << LogAgent::Event.new(:message => "[req=12345] First pid, first line", :fields => {'pid' => 9999})
+        filter << LogAgent::Event.new(:message => "[req=12345] Completed first request", :fields => {'pid' => 9999})
+
+        sink.events.size.should == 2
+        sink.events.first.message.should == "First pid, first line"
+        sink.events.last.message.should == "Completed first request"
+      end
+
+
     end
 
     describe "max-time parameter" do
@@ -128,6 +138,19 @@ describe LogAgent::Filter::RailsMultilineMessage do
           sink.events.first.message.should == "First pid, first line\nFirst pid, second line\nFirst pid, third line"
           done
         end
+      end
+
+      it "shouldn't blow up if a completed line arrives after the max-time" do
+        filter << LogAgent::Event.new(:message => "[req=12345] First pid, first line", :fields => {'pid' => 9999})
+        EM.add_timer(0.15) do
+          filter << LogAgent::Event.new(:message => "[req=12345] Completed first request", :fields => {'pid' => 9999})
+
+          sink.events.size.should == 2
+          sink.events.first.message.should == "First pid, first line"
+          sink.events.last.message.should == "Completed first request"
+          done
+        end
+
       end
 
     end
