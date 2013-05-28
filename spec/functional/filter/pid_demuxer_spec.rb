@@ -68,6 +68,14 @@ describe LogAgent::Filter::PidDemuxer do
     end
   end
 
+  it "should presume events without a PID have the same pid as the previous message" do
+    filter << LogAgent::Event.new(:message => "pid1-message", :fields => {'pid' => 9999})
+    filter << LogAgent::Event.new(:message => "pid1-message")
+    sink.events.size.should == 2
+    sink.events.first.tags.should include('pid-object-9999')
+    sink.events.last.tags.should include('pid-object-9999')
+  end
+
   describe "pid cleanup" do
 
     it "should default the pid-timeout to 60 seconds" do

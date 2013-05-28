@@ -20,6 +20,7 @@ module LogAgent::Filter
 
       @pid_last_used = {}
       @pid_objects = {}
+      @last_pid = nil
     end
 
     # Public: The pid-timeout value, i.e. the length of time a pid-sink will exist without receiving events before it is 
@@ -49,8 +50,10 @@ module LogAgent::Filter
     # Public: The sink method, to receive events.
     def << event
       pid = event.fields['pid']
-      sink = chain_for_pid(pid)
+
+      sink = chain_for_pid(pid || @last_pid)
       sink && sink << event
+      @last_pid = pid
     end
 
   end
