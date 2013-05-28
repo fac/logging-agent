@@ -49,7 +49,7 @@ module LogAgent::Filter
         :type        => first_event.type,
         :timestamp   => first_event.timestamp,
         :message     => events.collect { |event| event.message }.join("\n"),
-        
+        :fields      => events.inject({}) { |out,event| out.merge!(event.fields) }
       })
     end
   end
