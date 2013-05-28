@@ -1,0 +1,32 @@
+#!/usr/bin/env ruby
+
+#
+# Tests a filter configuration by passing a complete file 
+# through and printing the output
+#
+
+require 'log_agent'
+
+if ARGV.size != 1
+  $stderr.puts " Usage #{$0} [configuration]"
+  exit(1)
+end
+
+class StdoutPrinter
+  def << event
+    puts "EVENT(#{event.fields['request_id']}): #{event.message}"
+    puts " ** "
+  end
+end
+
+@chain = StdoutPrinter.new
+
+load(ARGV[0])
+
+EM.run do
+  until $stdin.eof?
+
+    line = $stdin.readline
+    @chain << LogAgent::Event.new(:message => line)
+  end
+end

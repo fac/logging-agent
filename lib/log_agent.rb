@@ -15,13 +15,16 @@ module LogAgent
     autoload 'AMQP',         'log_agent/input/amqp'
   end
   module Filter
-    autoload 'Base',             'log_agent/filter/base'
-    autoload 'Grep',             'log_agent/filter/grep'
-    autoload 'MultilineMessage', 'log_agent/filter/multiline_message'
-    autoload 'Rails',            'log_agent/filter/rails'
-    autoload 'Barnyard',         'log_agent/filter/barnyard'
-    autoload 'Ossec',            'log_agent/filter/ossec'
-    autoload 'PtDeadlock',       'log_agent/filter/pt_deadlock'
+    autoload 'Base',                  'log_agent/filter/base'
+    autoload 'Grep',                  'log_agent/filter/grep'
+    autoload 'MultilineMessage',      'log_agent/filter/multiline_message'
+    autoload 'Rails',                 'log_agent/filter/rails'
+    autoload 'Barnyard',              'log_agent/filter/barnyard'
+    autoload 'Ossec',                 'log_agent/filter/ossec'
+    autoload 'PtDeadlock',            'log_agent/filter/pt_deadlock'
+    autoload 'RubyLogFormatter',      'log_agent/filter/ruby_log_formatter'
+    autoload 'RailsMultilineMessage', 'log_agent/filter/rails_multiline_message'
+    autoload 'PidDemuxer',            'log_agent/filter/pid_demuxer'
   end
   module Output
     autoload 'ElasticsearchRiver', 'log_agent/output/elasticsearch_river'

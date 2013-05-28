@@ -2,7 +2,7 @@ module LogAgent::Filter
   class Rails < Base
     
     include LogAgent::LogHelper
-    
+
     def << event
       event.fields['rails_duration'] ||= {}
 

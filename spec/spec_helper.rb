@@ -17,5 +17,7 @@ Dir[File.expand_path("../support/*.rb", __FILE__)].each { |f| require f }
 RSpec.configure do |c|
 
   c.include FixtureLoading
+  c.include TimeHelpers
+
   c.extend FixtureLoadingClassMethods
 end
