@@ -24,6 +24,7 @@ module LogAgent
     autoload 'PtDeadlock',            'log_agent/filter/pt_deadlock'
     autoload 'RubyLogFormatter',      'log_agent/filter/ruby_log_formatter'
     autoload 'RailsMultilineMessage', 'log_agent/filter/rails_multiline_message'
+    autoload 'PidDemuxer',            'log_agent/filter/pid_demuxer'
   end
   module Output
     autoload 'ElasticsearchRiver', 'log_agent/output/elasticsearch_river'

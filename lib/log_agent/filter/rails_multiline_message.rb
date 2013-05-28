@@ -4,10 +4,48 @@ module LogAgent::Filter
   # This is a specific Rails multiline message filter, building on the 
   class RailsMultilineMessage < MultilineMessage
 
+    class RequestTimer
+      def initialize(max_time)
+        @max_time = max_time
+        @requests = []
+      end
+      def add(state)
+        @requests << state
+        update_timer
+      end
+      def remove(state)
+        @requests.delete(state)
+      end
+    private
+      def timer_fire
+        @requests.find do |request|
+          if (request.arrival_time + @max_time) > Time.now
+            request.emit!
+            true
+          else
+            false
+          end
+        end
+        update_timer
+      end
+      def update_timer
+        if @requests.first
+          timeout_interval = Time.now - (@requests.first.arrival_time + @max_time)
+          if timeout_interval > 0
+            EventMachine.add_timer(timeout_interval, &method(:timer_fire))
+          else
+            timer_fire
+          end
+        end
+      end
+    end
+
     class RequestState
       attr_reader :request_id
       attr_reader :events, :message_length
+      attr_reader :arrival_time
       def initialize(filter, request_id, &emit_block)
+        @arrival_time = Time.now
         @request_id = request_id
         @emit_block = emit_block
         @events = []
@@ -26,17 +64,16 @@ module LogAgent::Filter
       end
     private
       def cancel_timer
-        @timer && EventMachine.cancel_timer(@timer)  
+        @filter.timer.remove(self)
       end
       def reset_timer
-        if @filter.max_time
-          cancel_timer
-          @timer = EventMachine.add_timer(@filter.max_time) { emit! :timer_fired! }
-        end
+        cancel_timer
+        @filter.timer.add(self)
       end
     end
 
     attr_reader :max_time, :max_size
+    attr_reader :timer
 
     # Creates the filter
     #
@@ -57,8 +94,11 @@ module LogAgent::Filter
       @max_time = max_time
 
       @pids = {}
+      @timer = RequestTimer.new(max_time)
+
       super(chain, :start => /^Started /, :end => /^Completed /, :max => max_size )
     end
+
 
     def << event
 
