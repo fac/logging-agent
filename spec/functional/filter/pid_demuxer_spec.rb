@@ -12,6 +12,7 @@ describe LogAgent::Filter::PidDemuxer do
     end
   end
   class EventFilter < LogAgent::Filter::Base
+    attr_reader :tag
     def initialize(sink, tag)
       @tag = tag
       super(sink)
@@ -59,6 +60,34 @@ describe LogAgent::Filter::PidDemuxer do
       sink.events.first.tags.should include('pid-object-1234')
       sink.events.last.tags.should include('pid-object-3456')
     end
+
+    it "should drop events when a nil value is returned from the block"
+  end
+
+  describe "pid cleanup" do
+
+    it "should default the pid-timeout to 60 seconds" do
+      filter.pid_timeout.should == 60
+    end
+
+    describe "with a custom timeout value" do
+      let(:filter) { LogAgent::Filter::PidDemuxer.new(sink, :timeout => 0.1) { |pid, sink| EventFilter.new(sink, "pid-timeout-#{pid}") } }
+
+      it "should allow the timeout to be tweaked" do
+        filter.pid_timeout.should == 0.1
+      end
+
+      it "should allow the PID sink to be cleaned up when it has not been used for pid-timeout second" do
+        filter << LogAgent::Event.new(:message => "pid1-message", :fields => {'pid' => 1234})
+        sleep 0.2
+        filter << LogAgent::Event.new(:message => "pid1-message", :fields => {'pid' => 2345})
+        GC.start
+        ObjectSpace.each_object(EventFilter).find { |obj| obj.tag == 'pid-timeout-1234' }.should be_nil
+      end
+
+    end
+
+
   end
 
 
