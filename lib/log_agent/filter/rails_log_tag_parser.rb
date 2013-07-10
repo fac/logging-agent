@@ -37,7 +37,7 @@ module LogAgent
       def << event
         out_message = nil
 
-        s = StringScanner.new(event.message)
+        s = ::StringScanner.new(event.message)
         while s.check(/\[([^=\]]+)=?([^\]]+)?\]\s/)
           out_message ||= ""
 
