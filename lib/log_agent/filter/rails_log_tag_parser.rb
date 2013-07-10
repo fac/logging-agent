@@ -1,3 +1,4 @@
+require 'strscan'
 module LogAgent
 	module Filter
     class RailsLogTagParser < Base
