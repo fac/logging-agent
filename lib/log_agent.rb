@@ -25,6 +25,7 @@ module LogAgent
     autoload 'RubyLogFormatter',      'log_agent/filter/ruby_log_formatter'
     autoload 'RailsMultilineMessage', 'log_agent/filter/rails_multiline_message'
     autoload 'PidDemuxer',            'log_agent/filter/pid_demuxer'
+    autoload 'RailsLogTagParser',     'log_agent/filter/rails_log_tag_parser'
   end
   module Output
     autoload 'ElasticsearchRiver', 'log_agent/output/elasticsearch_river'
