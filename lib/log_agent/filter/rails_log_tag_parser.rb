@@ -59,8 +59,6 @@ module LogAgent
 
         super(event)
       end
-
-
     end
   end
 end
