@@ -23,7 +23,7 @@ module LogAgent::Filter
         event.fields['rails_redirect'] = $1
       end
 
-      if event.message =~ /^Completed (\d+) .* in (\d+)ms/
+      if event.message =~ /^Completed (\d+) .* in (\d+(?:\.\d+)?)ms/
         event.fields['rails_status'] = $1.to_i
         event.fields['rails_duration']['total'] = $2.to_f
       end

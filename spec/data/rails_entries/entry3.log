@@ -19,4 +19,4 @@ Rendered shared/_work_subnav.html.erb (2.1ms)
 Rendered invoices/_subnav.html.erb (2.2ms)
 Rendered invoices/show.html.erb within layouts/application (57.2ms)
 RequestCache: 0 hits out of 1 cache tests = 0% efficiency
-Completed 200 OK in 78ms (Views: 55.2ms | ActiveRecord: 65.5ms)
+Completed 200 OK in 120.7ms (Views: 55.2ms | ActiveRecord: 65.5ms)

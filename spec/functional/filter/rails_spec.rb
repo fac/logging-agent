@@ -174,7 +174,7 @@ describe LogAgent::Filter::Rails do
     it "should parse the total duration and breakdown" do
       entry1.fields['rails_duration'].should == {"total" => 12, "views" => 0.9, "activerecord" => 4.7}
       entry2.fields['rails_duration'].should == {"total" => 6, "views" => 5.5, "activerecord" => 0.0}
-      entry3.fields['rails_duration'].should == {"total" => 78, "views" => 55.2, "activerecord" => 65.5}
+      entry3.fields['rails_duration'].should == {"total" => 120.7, "views" => 55.2, "activerecord" => 65.5}
       entry4.fields['rails_duration'].should == {"total" => 28}
       entry5.fields['rails_duration'].should == {"total" => 12}
       entry6.fields['rails_duration'].should == {"total" => 133, "views" => 35.3, "activerecord" => 57.0}
