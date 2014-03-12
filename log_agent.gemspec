@@ -86,13 +86,16 @@ Gem::Specification.new do |s|
   }
   s.require_paths = ["lib"]
 
-  s.add_runtime_dependency 'eventmachine'
+  s.add_runtime_dependency 'eventmachine', '~> 1.0.3'
   s.add_runtime_dependency 'amqp', '~> 1.3'
-  s.add_runtime_dependency 'uuid'
-  s.add_runtime_dependency 'json'
-  s.add_runtime_dependency 'daemons'
+  s.add_runtime_dependency 'uuid', '~> 2.3.5'
+
+  # JSON has native extensions ensure we use the yum installed
+  # version
+  s.add_runtime_dependency 'json', '=1.5.1'
+  s.add_runtime_dependency 'daemons', '~> 1.1.8'
   s.add_runtime_dependency 'eventmachine-tail'
-  
+
   s.add_development_dependency 'rspec'
   s.add_development_dependency 'evented-spec'
   s.add_development_dependency 'timecop'
