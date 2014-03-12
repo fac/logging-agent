@@ -6,7 +6,7 @@ PATH
       daemons (~> 1.1.8)
       eventmachine (~> 1.0.3)
       eventmachine-tail
-      json (= 1.5.1)
+      json (= 1.5.4)
       uuid (~> 2.3.5)
 
 GEM
@@ -22,7 +22,7 @@ GEM
     eventmachine (1.0.3)
     eventmachine-tail (0.6.4)
       eventmachine
-    json (1.5.1)
+    json (1.5.4)
     macaddr (1.6.7)
       systemu (~> 2.6.2)
     rspec (2.8.0)

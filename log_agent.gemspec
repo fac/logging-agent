@@ -92,7 +92,7 @@ Gem::Specification.new do |s|
 
   # JSON has native extensions ensure we use the yum installed
   # version
-  s.add_runtime_dependency 'json', '=1.5.1'
+  s.add_runtime_dependency 'json', '=1.5.4'
   s.add_runtime_dependency 'daemons', '~> 1.1.8'
   s.add_runtime_dependency 'eventmachine-tail'
 
