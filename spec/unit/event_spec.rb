@@ -182,14 +182,14 @@ describe LogAgent::Event, "behaviour" do
 
     it "should load the object even if @captured_at isn't present" do
       Timecop.freeze do
-        payload = JSON.dump(JSON.load(event.to_payload.tap { |hash| hash.delete("@captured_at") }))
+        payload = JSON.dump(JSON.load(event.to_payload).tap { |hash| hash.delete("@captured_at") })
         LogAgent::Event.from_payload(payload).captured_at.should == Time.now
       end
     end
     
     it "should load the object even if @timestamp isn't present" do
       Timecop.freeze do
-        payload = JSON.dump(JSON.load(event.to_payload.tap { |hash| hash.delete("@timestamp") }))
+        payload = JSON.dump(JSON.load(event.to_payload).tap { |hash| hash.delete("@timestamp") })
         LogAgent::Event.from_payload(payload).timestamp.should == Time.now
       end
     end
