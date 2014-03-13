@@ -86,7 +86,9 @@ Gem::Specification.new do |s|
   }
   s.require_paths = ["lib"]
 
-  s.add_runtime_dependency 'eventmachine', '~> 1.0.3'
+  # Eventmachine has native extensions. pin to version
+  # we currentyl have prebuilt
+  s.add_runtime_dependency 'eventmachine', '=0.12.10'
   s.add_runtime_dependency 'amqp', '~> 1.3'
   s.add_runtime_dependency 'uuid', '~> 2.3.5'
 
@@ -94,7 +96,7 @@ Gem::Specification.new do |s|
   # version
   s.add_runtime_dependency 'json', '=1.5.4'
   s.add_runtime_dependency 'daemons', '~> 1.1.8'
-  s.add_runtime_dependency 'eventmachine-tail'
+  s.add_runtime_dependency 'eventmachine-tail', '~> 0.6.3'
 
   s.add_development_dependency 'rspec'
   s.add_development_dependency 'evented-spec'
