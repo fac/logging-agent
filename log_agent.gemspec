@@ -29,6 +29,7 @@ Gem::Specification.new do |s|
     lib/log_agent/filter/rails_multiline_message.rb
     lib/log_agent/filter/pid_demuxer.rb
     lib/log_agent/filter/rails_log_tag_parser.rb
+    lib/log_agent/filter/mysql_slow.rb
     lib/log_agent/input/amqp.rb
     lib/log_agent/input/base.rb
     lib/log_agent/input/file_tail.rb
