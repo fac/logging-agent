@@ -5,14 +5,14 @@ module LogAgent::Filter
     include LogAgent::LogHelper
 
     def initialize sink
-      @timestamp = Time.now
+      @timestamp = Time.now.utc
       @event = {}
       super sink
     end
 
     def << event
       if event.message =~ /^# Time: (\d+ \d\d:\d\d:\d\d)$/
-        @timestamp = Time.parse($1) rescue Time.now
+        @timestamp = Time.parse($1).utc rescue Time.now.utc
         debug "Timestamp is #{@timestamp}"
       end
 
@@ -22,10 +22,10 @@ module LogAgent::Filter
       end
 
       if event.message =~ /^# Query_time: (\d+)  Lock_time: (\d+)  Rows_sent: (\d+)  Rows_examined: (\d+)$/
-        @event['mysql_slow_query_time'] = $1
-        @event['mysql_slow_lock_time'] = $2
-        @event['mysql_slow_rows_sent'] = $3
-        @event['mysql_slow_rows_examamined'] = $3
+        @event['mysql_slow_query_time'] = $1.to_i
+        @event['mysql_slow_lock_time'] = $2.to_i
+        @event['mysql_slow_rows_sent'] = $3.to_i
+        @event['mysql_slow_rows_examined'] = $4.to_i
       end
 
       if event.message =~ /^([^#].*)$/

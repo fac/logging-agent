@@ -1,0 +1,4 @@
+# Time: 140331 15:05:29
+# User@Host: bob[bob] @  [10.11.11.11]
+# Query_time: 3  Lock_time: 0  Rows_sent: 2  Rows_examined: 322814
+SELECT name FROM animals WHERE noise = 'moo';
