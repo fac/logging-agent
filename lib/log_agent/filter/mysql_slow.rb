@@ -4,7 +4,9 @@ module LogAgent::Filter
 
     include LogAgent::LogHelper
 
-    def initialize sink
+    def initialize sink, options = {}
+      @options = options
+      @bufsize = options[:bufsize]
       @timestamp = Time.now.utc
       @event = {}
       super sink
@@ -28,7 +30,8 @@ module LogAgent::Filter
         @event['mysql_slow_rows_examined'] = $4.to_i
       end
 
-      if event.message =~ /^([^#].*)$/
+      if event.message =~ /^[^#].*$/
+        event.message = event.message.slice(0, @bufsize)
         event.timestamp = @timestamp
         event.fields.merge! @event
         emit event
