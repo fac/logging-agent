@@ -1,0 +1,5 @@
+# Time: 140331 15:05:29
+# User@Host: alice[alice] @  [10.11.11.12]
+# Query_time: 3  Lock_time: 0  Rows_sent: 2  Rows_examined: 3224
+SELECT name FROM animals WHERE noise = 'moo';
+SELECT noise FROM animals WHERE name = 'sheep';
