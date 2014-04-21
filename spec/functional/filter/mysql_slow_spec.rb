@@ -277,10 +277,10 @@ WHERE s11 > ANY
           filter.fingerprint("select foo -- bar\n").should == 'select foo'
         end
 
-        xit "should normalize commas and equals" do
-          filter.fingerprint("select a,b ,c , d from tbl where a=5 or a = 5 or a=5 or a =5").should ==
-            "select a, b, c, d from tbl where a=? or a=? or a=? or a=?"
-        end
+        # xit "should normalize commas and equals" do
+        #   filter.fingerprint("select a,b ,c , d from tbl where a=5 or a = 5 or a=5 or a =5").should ==
+        #     "select a, b, c, d from tbl where a=? or a=? or a=? or a=?"
+        # end
 
         it "should handle bug from perlmonks thread 728718" do
           filter.fingerprint("select null, 5.001, 5001. from foo").should ==
