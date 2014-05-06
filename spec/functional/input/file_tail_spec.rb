@@ -5,7 +5,7 @@ describe LogAgent::Input::FileTail do
   
   let(:sink) { mock("FileTailSink", :<< => nil) }
 
-  let(:file_tail) { LogAgent::Input::FileTail.new sink, :path => '/tmp/*.log', :tags => ['tag_a', 'tag_b'], :type => "rails" }
+  let(:file_tail) { LogAgent::Input::FileTail.new sink, :path => '/tmp/mytest*.log', :tags => ['tag_a', 'tag_b'], :type => "rails" }
   let(:logfile1) { File.open("/tmp/mytest1.log", "a") }
   let(:logfile2) { File.open("/tmp/mytest2.log", "a") }
 
@@ -14,7 +14,7 @@ describe LogAgent::Input::FileTail do
   end
 
   it "should configure the file path" do
-    file_tail.path.should == '/tmp/*.log'
+    file_tail.path.should == '/tmp/mytest*.log'
     done
   end
 
@@ -57,17 +57,23 @@ describe LogAgent::Input::FileTail do
   
   it "should handle more than one glob" do
     sink2 = mock("AnotherSink")
-    different_file_tail = LogAgent::Input::FileTail.new sink2, :path => ['/tmp/mytest1.*', '/tmp/mytest2.*']
+
+    mylog1 = File.open("/tmp/mylog1.log", "a")
+    mylog2 = File.open("/tmp/mylog2.log", "a")
+
+    different_file_tail = LogAgent::Input::FileTail.new sink2, :path => ['/tmp/mylog1.*', '/tmp/mylog2.*']
+
+
     sink2.should_receive(:<<).ordered { |event|
-      event.source_path.should == "/tmp/mytest1.log"
+      event.source_path.should == "/tmp/mylog1.log"
     }
     sink2.should_receive(:<<).ordered { |event|
-      event.source_path.should == "/tmp/mytest2.log"
+      event.source_path.should == "/tmp/mylog2.log"
       done
     }
     
-    EM.add_timer(0.1) { logfile1.puts "This is a logfile"; logfile1.flush }
-    EM.add_timer(0.2) { logfile2.puts "This is a logfile"; logfile2.flush }
+    EM.add_timer(0.1) { mylog1.puts "This is a mylog"; mylog1.flush }
+    EM.add_timer(0.2) { mylog2.puts "This is a mylog"; mylog2.flush }
   end
 
   it "should assign the tags of the file to the Event" do
