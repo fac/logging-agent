@@ -24,7 +24,9 @@ describe LogAgent::Event, "behaviour" do
     end
 
     it "should persist the captured_at value through the payload" do
-      LogAgent::Event.from_payload(LogAgent::Event.new(:captured_at => test_timestamp).to_payload).captured_at.should == test_timestamp
+      # We use iso8601(6) which truncates rather than rounds
+      my_timestamp = Time.now.round(6)
+      LogAgent::Event.from_payload(LogAgent::Event.new(:captured_at => my_timestamp).to_payload).captured_at.should == my_timestamp
     end
 
   end
