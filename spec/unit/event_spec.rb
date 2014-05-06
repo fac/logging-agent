@@ -23,8 +23,8 @@ describe LogAgent::Event, "behaviour" do
       LogAgent::Event.new(:captured_at => test_timestamp).captured_at.should == test_timestamp
     end
 
-    it "should persist the captured_at value through the payload" do
-      LogAgent::Event.from_payload(LogAgent::Event.new(:captured_at => test_timestamp).to_payload).captured_at.should == test_timestamp
+    it "should persist the captured_at value through the payload with microsecond precision" do
+      LogAgent::Event.from_payload(LogAgent::Event.new(:captured_at => test_timestamp).to_payload).captured_at.should == test_timestamp.round(6)
     end
 
   end
