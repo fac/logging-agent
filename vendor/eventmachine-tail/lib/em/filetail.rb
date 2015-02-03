@@ -225,6 +225,62 @@ class EventMachine::FileTail
 
   # Watch our file.
   private
+
+  class FakedWatcher
+
+    # We create an instane of klass, pass it into the callback function
+    # then trigger the following methods:
+    #
+    # file_modified
+    # file_moved
+    # file_deleted
+    # unbind
+    #
+    def initialize(path, klass, callback)
+      @path = path
+      @instance = klass.new(callback)
+      stat_file
+      @timer = EM.add_periodic_timer(0.05, &method(:stat_file))
+    end
+
+    def stat_file
+      stat = File.stat(@path)
+      mtime = stat.mtime.to_f
+      inode = stat.ino
+
+      if @last_inode && @last_inode != inode
+        @instance.file_moved
+      elsif @last_mtime && @last_mtime != mtime
+        @instance.file_modified
+      end
+      @last_mtime = mtime
+      @last_inode = inode
+
+    rescue Errno::ENOENT
+      @instance.file_deleted unless @last_inode == :deleted
+      @last_inode = :deleted
+    end
+
+    def stop_watching
+      @timer.cancel if @timer
+      @instance.unbind
+    end
+
+  end
+
+  # Argh, on solaris, watch_file shits a brick and causes a ruby panic from EM
+  #
+  # So instead, lets just watch `tail -f` since, on illumos, it uses event ports FEM
+  #
+  # Note: This is a total hack.
+  def setup_watch(path, callback)
+    if RUBY_PLATFORM =~ /solaris/
+      FakedWatcher.new(path, EventMachine::FileTail::SolarisFileWatcher, callback)
+    else
+      EventMachine::watch_file(path, EventMachine::FileTail::FileWatcher, callback)
+    end
+  end
+
   def watch
     @watch.stop_watching if @watch
     @symlink_timer.cancel if @symlink_timer
@@ -232,7 +288,7 @@ class EventMachine::FileTail
 
     @logger.debug "Starting watch on #{@path}"
     callback = proc { |what| notify(what) }
-    @watch = EventMachine::watch_file(@path, EventMachine::FileTail::FileWatcher, callback)
+    @watch = setup_watch(@path, callback)
     watch_symlink if @symlink_target
   end # def watch
 
@@ -418,7 +474,7 @@ end # class EventMachine::FileTail
 # to watch files you are tailing.
 #
 # See also: EventMachine::FileTail#watch
-class EventMachine::FileTail::FileWatcher < EventMachine::FileWatch
+module FileWatcherMethods
   def initialize(block)
     @logger = Logger.new(STDERR)
     @logger.level = ($DEBUG and Logger::DEBUG or Logger::WARN)
@@ -440,7 +496,14 @@ class EventMachine::FileTail::FileWatcher < EventMachine::FileWatch
   def unbind
     @callback.call(:unbind)
   end # def unbind
+end
+class EventMachine::FileTail::FileWatcher < EventMachine::FileWatch
+  include FileWatcherMethods
 end # class EventMachine::FileTail::FileWatch < EventMachine::FileWatch
+
+class EventMachine::FileTail::SolarisFileWatcher
+  include FileWatcherMethods
+end
 
 # Add EventMachine::file_tail
 module EventMachine
