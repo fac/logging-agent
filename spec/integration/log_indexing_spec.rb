@@ -9,8 +9,9 @@ require 'spec_helper'
 describe "Log Indexing with a durable shared queue" do
   include EventedSpec::AMQPSpec
 
-  let(:channel) { AMQP::Channel.new }
+  default_timeout 1.0
 
+  let(:channel) { AMQP::Channel.new }
   let(:output_exchange) { channel.fanout('dev-elasticsearch', :durable => true) }
 
   let(:shared_queue) { channel.queue('dev-queue2', :arguments => {'x-expiry' => "500" } ) }
@@ -28,7 +29,7 @@ describe "Log Indexing with a durable shared queue" do
     # Hook up to an ES-river indexer
     @river = LogAgent::Output::ElasticsearchRiver.new(channel, output_exchange, 'elasticsearch')
 
-    # Get an AMQP source listening to the logs exchange, with no key filter    
+    # Get an AMQP source listening to the logs exchange, with no key filter
     @source = LogAgent::Input::AMQP.new(@river, channel, 'logs', '#', shared_queue)
   end
 

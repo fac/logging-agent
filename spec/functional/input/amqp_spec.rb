@@ -3,6 +3,8 @@ require 'spec_helper'
 describe LogAgent::Input::AMQP, "creation" do
   include EventedSpec::AMQPSpec
 
+  default_timeout 1.0
+
   let(:channel) { AMQP::Channel.new }
   let(:exchange) { channel.fanout('dev-logs') }
 
@@ -44,7 +46,7 @@ describe LogAgent::Input::AMQP, "creation" do
       my_sink.should_not_receive(:<<)
       LogAgent.logger.should_receive(:warn) { |message|
         message.should =~ /unexpected token at 'gibberish'/
-        done 
+        done
       }
 
       input.callback do
@@ -74,7 +76,7 @@ describe LogAgent::Input::AMQP, "creation" do
       end
     end
     it "should succeed immediately" do
-      input.callback do 
+      input.callback do
         done
       end
     end

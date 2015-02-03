@@ -3,6 +3,8 @@ require 'spec_helper'
 describe LogAgent::Output::ElasticsearchRiver, "creation" do
   include EventedSpec::AMQPSpec
 
+  default_timeout 1.0
+
   let(:channel) { AMQP::Channel.new }
   let(:output) { LogAgent::Output::ElasticsearchRiver.new channel, 'es-dev', 'key' }
 

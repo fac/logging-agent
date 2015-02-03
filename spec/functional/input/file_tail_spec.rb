@@ -2,7 +2,9 @@ require 'spec_helper'
 
 describe LogAgent::Input::FileTail do
   include EventedSpec::EMSpec
-  
+
+  default_timeout 0.5
+
   let(:sink) { mock("FileTailSink", :<< => nil) }
 
   let(:file_tail) { LogAgent::Input::FileTail.new sink, :path => '/tmp/mytest*.log', :tags => ['tag_a', 'tag_b'], :type => "rails" }
@@ -50,11 +52,11 @@ describe LogAgent::Input::FileTail do
       event.source_path.should == "/tmp/mytest2.log"
       done
     }
-    
+
     EM.add_timer(0.1) { logfile1.puts "This is a logfile"; logfile1.flush }
     EM.add_timer(0.2) { logfile2.puts "This is a logfile"; logfile2.flush }
   end
-  
+
   it "should handle more than one glob" do
     sink2 = mock("AnotherSink")
 
@@ -71,7 +73,7 @@ describe LogAgent::Input::FileTail do
       event.source_path.should == "/tmp/mylog2.log"
       done
     }
-    
+
     EM.add_timer(0.1) { mylog1.puts "This is a mylog"; mylog1.flush }
     EM.add_timer(0.2) { mylog2.puts "This is a mylog"; mylog2.flush }
   end
@@ -99,7 +101,7 @@ describe LogAgent::Input::FileTail do
 
   describe "when type == :json" do
     before { file_tail.format = :json }
-    
+
     it "should populate the fields and empty the message in the event if the FileTail is marked as :type => :json" do
       sink.should_receive(:<<) { |event|
         event.fields.should == {"cowsgo" => "moo", "dogsgo" => "woof"}
@@ -121,7 +123,7 @@ describe LogAgent::Input::FileTail do
 
   describe "when type == :json_event" do
     em_before { file_tail.format = :json_event }
-    
+
     it "should try and re-create the Event object from the JSON" do
       sink.should_receive(:<<) { |event|
         event.uuid.should == '1122334'
@@ -156,12 +158,12 @@ describe LogAgent::Input::FileTail do
       done
     }
     EM.add_timer(0.2) { logfile1.puts %({"cowsgo":"moo","dogsgo":"woof"}); logfile1.flush }
-    
+
   end
 
   it "should send any data written to a file that has been seen before, since last seeing it"
 
-# globbing / source_path in the 
+# globbing / source_path in the
 # JSON type / JSON-event type / plain type
 end
 
