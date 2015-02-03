@@ -4,7 +4,7 @@ require 'spec_helper'
 describe LogAgent::Filter::PtDeadlock do
   let(:sink) { mock('MySinkObject', :<< => nil) }
   let(:filter) { LogAgent::Filter::PtDeadlock.new sink }
-  
+
   it 'should be created with new <sink>' do
     filter.sink.should == [sink]
   end
@@ -18,8 +18,11 @@ describe LogAgent::Filter::PtDeadlock do
     end
 
     it 'should parse the timtestamp correctly' do
-      entry1.timestamp.utc.to_s.should == '2013-04-23 17:30:04 UTC'
-      entry2.timestamp.utc.to_s.should == '2013-05-08 12:02:31 UTC'
+      # the file actually contains "18:30" but without timezone qualifier, so we use the
+      # local system timezone to work out what is displayed. Either way, we should omit UTC
+      # with a timezone qualifier (hence the comparison to UTC)
+      entry1.timestamp.utc.should == Time.local(2013,4,23, 18,30,04)
+      entry2.timestamp.utc.should == Time.local(2013,5,8,  13,02,31)
     end
 
     it 'should parse the server' do
