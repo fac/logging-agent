@@ -1,9 +1,11 @@
+# Ensure we require the vendor'd eventmachine-tail
+$:.unshift(File.expand_path('../../../../vendor/eventmachine-tail/lib', __FILE__))
 require 'eventmachine-tail'
 
 module LogAgent::Input
   class FileTail < Base
     include LogAgent::LogHelper
-    
+
     attr_accessor :format, :type, :message_format
     attr_reader :path, :tags
 
@@ -43,7 +45,7 @@ module LogAgent::Input
           :tags           => self.tags.dup,
           :type           => self.type
         }
-      
+
         if format.to_s == 'json'
           debug "Parsing JSON"
           begin
@@ -54,10 +56,10 @@ module LogAgent::Input
             LogAgent.logger.warn("Failed to parse JSON line from file: '#{file.path}': #{$!.message}")
           end
         end
-        event = LogAgent::Event.new(params)        
+        event = LogAgent::Event.new(params)
       end
 
-      if event 
+      if event
         debug "Emitting event '#{event.uuid}'"
         emit event
       end

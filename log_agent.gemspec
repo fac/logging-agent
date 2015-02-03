@@ -136,7 +136,6 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'uuid', '~> 2.3.5'
   s.add_runtime_dependency 'json', '~> 1.5.4'
   s.add_runtime_dependency 'daemons', '~> 1.1.8'
-  s.add_runtime_dependency 'eventmachine-tail', '~> 0.6.3'
 
   s.add_development_dependency 'rspec'
   s.add_development_dependency 'evented-spec'
