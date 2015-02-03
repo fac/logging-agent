@@ -29,11 +29,11 @@ module LogAgent::Input
         :tags => self.tags.dup,
         :fields => {}
       }
-      
+
       if message =~ /^<(\d+)>(.*)$/
         prival = $1.to_i
         message = $2
-        
+
         params[:fields].merge!({
           'syslog_version'    => 1,
           'syslog_severity'   => SEVERITY[prival % 8],
@@ -48,7 +48,7 @@ module LogAgent::Input
             'syslog_proc_id'    => ($4 == '-' ? nil : $4),
             'syslog_msg_id'     => ($5 == '-' ? nil : $5),
             'syslog_app_string' => [$3, $4 == '-' ? "" : "[#{$4}]"].join(''),
-            'syslog_timestamp'  => params[:timestamp].strftime('%b %d %H:%M:%S'),
+            'syslog_timestamp'  => params[:timestamp].utc.strftime('%b %d %H:%M:%S'),
             'syslog_message'    => $6
           })
 
@@ -74,7 +74,7 @@ module LogAgent::Input
       if params[:message].nil?
         params[:message] = message
       end
-      
+
       LogAgent::Event.new(params)
     end
 
