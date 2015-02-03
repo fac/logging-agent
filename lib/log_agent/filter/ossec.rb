@@ -28,8 +28,8 @@ module LogAgent::Filter
         event.fields['ossec_username'] = $1
       end
 
-      time = event.timestamp.strftime("%H:%M:%S")
-      if event.message =~ /#{time} \(([^\)]+)\)/
+      time = event.timestamp.localtime.strftime("%H:%M:%S")
+      if event.message =~ /\d{1,2}\:\d{2}\:\d{2} \(([^\)]+)\)/
         event.fields['ossec_hostname'] = $1
       end
       emit(event)
