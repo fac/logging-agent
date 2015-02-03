@@ -1,5 +1,4 @@
 # Ensure we require the vendor'd eventmachine-tail
-$:.unshift(File.expand_path('../../../../vendor/eventmachine-tail/lib', __FILE__))
 require 'eventmachine-tail'
 
 module LogAgent::Input

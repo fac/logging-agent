@@ -3,7 +3,7 @@ require 'spec_helper'
 describe LogAgent::Input::FileTail do
   include EventedSpec::EMSpec
 
-  default_timeout 0.5
+  default_timeout 5.0
 
   let(:sink) { mock("FileTailSink", :<< => nil) }
 

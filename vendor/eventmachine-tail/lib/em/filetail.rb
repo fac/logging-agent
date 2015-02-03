@@ -226,7 +226,7 @@ class EventMachine::FileTail
   # Watch our file.
   private
 
-  class FakedWatcher
+  class FakedWatcher < EventMachine::Connection
 
     # We create an instane of klass, pass it into the callback function
     # then trigger the following methods:
@@ -236,11 +236,19 @@ class EventMachine::FileTail
     # file_deleted
     # unbind
     #
-    def initialize(path, klass, callback)
+    attr_reader :path, :instance
+
+    def initialize(path, instance)
       @path = path
-      @instance = klass.new(callback)
+      @instance = instance
       stat_file
-      @timer = EM.add_periodic_timer(0.05, &method(:stat_file))
+
+      @timer = EM.add_periodic_timer(1.0) { stat_file }
+    end
+
+    # Fired when tail -f pushes stuff to us
+    def receive_data(data)
+      stat_file
     end
 
     def stat_file
@@ -263,7 +271,8 @@ class EventMachine::FileTail
 
     def stop_watching
       @timer.cancel if @timer
-      @instance.unbind
+      self.close_connection
+      @instance.close_connection if @instance
     end
 
   end
@@ -275,7 +284,7 @@ class EventMachine::FileTail
   # Note: This is a total hack.
   def setup_watch(path, callback)
     if RUBY_PLATFORM =~ /solaris/
-      FakedWatcher.new(path, EventMachine::FileTail::SolarisFileWatcher, callback)
+      EM.popen(Shellwords.shelljoin(["/usr/bin/tail","-f", "-n","0",@path]), FakedWatcher, path, EventMachine::FileTail::SolarisFileWatcher.new(callback))
     else
       EventMachine::watch_file(path, EventMachine::FileTail::FileWatcher, callback)
     end
@@ -502,6 +511,9 @@ class EventMachine::FileTail::FileWatcher < EventMachine::FileWatch
 end # class EventMachine::FileTail::FileWatch < EventMachine::FileWatch
 
 class EventMachine::FileTail::SolarisFileWatcher
+  def close_connection
+    unbind
+  end
   include FileWatcherMethods
 end
 

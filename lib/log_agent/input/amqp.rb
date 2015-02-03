@@ -37,7 +37,7 @@ module LogAgent::Input
       end
     rescue
       warn("Failed to decode JSON message: #{$!.message}")
-      header.reject(:requeue => true)
+      header.reject(:requeue => false)
     end
   end
 

@@ -6,7 +6,7 @@ describe LogAgent::Input::AMQP, "creation" do
   default_timeout 1.0
 
   let(:channel) { AMQP::Channel.new }
-  let(:exchange) { channel.fanout('dev-logs') }
+  let(:exchange) { channel.fanout("dev-logs-#{Time.now.to_f}") }
 
   let(:my_sink ) { mock("Sink", :<< => nil ) }
 
@@ -16,11 +16,11 @@ describe LogAgent::Input::AMQP, "creation" do
   end
 
   describe "without a queue specified" do
-    let(:input) { LogAgent::Input::AMQP.new(my_sink, channel, 'dev-logs', '#') }
+    let(:input) { LogAgent::Input::AMQP.new(my_sink, channel, exchange.name, '#') }
 
     it "should specify the channel, exchange name and routing key filter" do
       input.channel.should == channel
-      input.exchange.should == 'dev-logs'
+      input.exchange.should == exchange.name
       input.routing_key.should == '#'
       done
     end
