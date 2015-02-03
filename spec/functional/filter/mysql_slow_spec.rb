@@ -71,7 +71,7 @@ describe LogAgent::Filter::MysqlSlow do
         filter << LogAgent::Event.new(:message => "# Time: 140331 15:05:29")
         filter << LogAgent::Event.new(:message => "SELECT things from HERE;")
         events.size.should == 1
-        events.first.timestamp.should == Time.utc(2014, 03, 31, 14, 05, 29)
+        events.first.timestamp.should == Time.local(2014, 03, 31, 15, 05, 29)
       end
 
 
@@ -83,9 +83,9 @@ describe LogAgent::Filter::MysqlSlow do
         filter << LogAgent::Event.new(:message => "SELECT things FROM here;")
 
         events.size.should == 3
-        events[0].timestamp.should == Time.utc(2014, 03, 31, 14, 05, 29)
-        events[1].timestamp.should == Time.utc(2014, 03, 31, 14, 05, 29)
-        events[2].timestamp.should == Time.utc(2014, 03, 31, 14, 06, 30)
+        events[0].timestamp.should == Time.local(2014, 03, 31, 15, 05, 29)
+        events[1].timestamp.should == Time.local(2014, 03, 31, 15, 05, 29)
+        events[2].timestamp.should == Time.local(2014, 03, 31, 15, 06, 30)
       end
 
       it "should associate the upstream timestamp with a query if it can't parse the comment" do
