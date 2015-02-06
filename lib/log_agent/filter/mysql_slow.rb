@@ -6,6 +6,16 @@ module LogAgent::Filter
 
     include LogAgent::LogHelper
 
+    IGNORE_MATCHES = [
+      # Ignore the header at the start of the file
+      /.+, Version: .+ started with\:$/,
+      /^Tcp port\: .+ Unix socket\:/,
+      /^Time\s+Id\s+Command\s+Argument$/,
+
+      # ignore use ...; statements entirely for now, they don't occur often enough for us to rely on then :-(
+      /^use (.*);$/i
+    ]
+
     attr_reader :limit
 
     # Creates the slow query logger with given options:
@@ -79,7 +89,6 @@ module LogAgent::Filter
     end
 
     def << event
-
       # Truncate the message if necessary
       if event.message.size > @limit
         event.fields['truncated'] = true
@@ -102,9 +111,9 @@ module LogAgent::Filter
           @connection_data = { "user" => $1, "system_user" => $2, "host" => $3 }
         end
 
-      # ignore use ...; statements, but grab the database
-      elsif event.message =~ /^use (.*);$/i
-        @database = $1
+
+      # Check if we should ignore this line.
+      elsif IGNORE_MATCHES.find { |r| event.message =~ r }
 
       else
         if @timestamp
@@ -116,9 +125,6 @@ module LogAgent::Filter
         if @query_data
           event.fields['query'] = @query_data
           @query_data = nil
-        end
-        if @database
-          event.fields['database'] = @database
         end
 
         event.fields['fingerprint'] = Digest::MD5.hexdigest(fingerprint(event.message)) unless event.fields['truncated']

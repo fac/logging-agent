@@ -23,6 +23,12 @@ describe LogAgent::Filter::MysqlSlow do
 
     it "should break queries on a semicolon rather than newline, up to the limit"
 
+    it "should ignore the file headers" do
+      entry4
+      events.size.should == 1
+      events.first.message.should =~ /^SELECT DISTINCT/
+    end
+
     it "should not pass through any commented lines" do
       filter << LogAgent::Event.new(:message => "foo;")
       filter << LogAgent::Event.new(:message => "# stuff here")
@@ -146,27 +152,6 @@ describe LogAgent::Filter::MysqlSlow do
         events[2].fields['connection']['user'].should == 'john'
         events[2].fields['connection']['system_user'].should == 'john'
         events[2].fields['connection']['host'].should == '6.6.6.6'
-      end
-    end
-
-    describe "database use statement parsing" do
-      it "should not attach the database by default" do
-        filter << LogAgent::Event.new(:message => "SELECT things from HERE;")
-        events.first.fields['database'].should be_nil
-      end
-
-      it "should drop use statements as metadata" do
-        filter << LogAgent::Event.new(:message => "use some_database;")
-        events.size.should == 0
-      end
-
-      it "should attach the database line if a use statement has been encountered" do
-        filter << LogAgent::Event.new(:message => "use database_a;")
-        filter << LogAgent::Event.new(:message => "SELECT things from HERE;")
-        filter << LogAgent::Event.new(:message => "SELECT things from HERE;")
-        filter << LogAgent::Event.new(:message => "USE database_b;")
-        filter << LogAgent::Event.new(:message => "SELECT things from HERE;")
-        events.map { |e| e.fields['database'] }.should == ['database_a', 'database_a', 'database_b']
       end
     end
 
