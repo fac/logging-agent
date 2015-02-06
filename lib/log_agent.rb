@@ -4,12 +4,13 @@ require 'eventmachine'
 require 'logger'
 require 'log_agent/version'
 require 'time'
+require 'socket'
 
 module LogAgent
   autoload 'Event',        'log_agent/event'
 
   module Input
-    autoload 'Base',         'log_agent/input/base'    
+    autoload 'Base',         'log_agent/input/base'
     autoload 'FileTail',     'log_agent/input/file_tail'
     autoload 'SyslogServer', 'log_agent/input/syslog_server'
     autoload 'AMQP',         'log_agent/input/amqp'
@@ -56,5 +57,14 @@ module LogAgent
     @logger ||= Logger.new($stderr).tap { |logger|
       logger.level = !!ENV['DEBUG'] ? Logger::DEBUG : Logger::INFO
     }
+  end
+
+  # Allows the value of source_host set in locally generated events to be configured externally, rather than relying
+  # on Socket.gethostname
+  def self.hostname=(new_value)
+    @hostname = new_value
+  end
+  def self.hostname
+    @hostname || Socket.gethostname
   end
 end
