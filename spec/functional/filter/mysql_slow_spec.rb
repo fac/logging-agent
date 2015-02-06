@@ -35,8 +35,8 @@ describe LogAgent::Filter::MysqlSlow do
     end
 
     describe "limiting query length" do
-      it "should default the limit to 1024 bytes" do
-        filter.limit.should == 1024
+      it "should default the limit to 20k bytes" do
+        filter.limit.should == 1024 * 20
       end
 
       it "should truncate lines to the limit parameter, if they exceed it" do
@@ -172,6 +172,10 @@ describe LogAgent::Filter::MysqlSlow do
 
     describe "query fingerprint calculation" do
 
+      it "should not report a fingerprint if the query is truncated" do
+        LogAgent::Filter::MysqlSlow.new(sink, :limit => 5) << LogAgent::Event.new(:message => "Select * from foobarbaz;")
+        events.first.fields['fingerprint'].should be_nil
+      end
       it "should attach the fingerprint of all queries" do
         filter << LogAgent::Event.new(:message => "SELECT  companies.*, COUNT(notifications.id) notifications_count FROM `companies` INNER JOIN `subscriptions` ON `subscriptions`.`company_id` = `companies`.`id` INNER JOIN `account_managers` ON `companies`.`account_manager_id` = `account_managers`.`id` LEFT JOIN notifications ON (notifications.company_id = companies.id AND notifications.dismissed_at IS NULL ) WHERE `account_managers`.`accountancy_practice_id` = 11789 AND (subscriptions.status <> 'Cancelled') AND (subscriptions.status <> 'Suspended') AND (subscriptions.free_trial_expires_on IS NULL OR subscriptions.free_trial_expires_on >= '2014-04-21') GROUP BY companies.id ORDER BY companies.name ASC LIMIT 30 OFFSET 0;")
         events.first.fields['fingerprint'].should == Digest::MD5.hexdigest("select companies.*, count(notifications.id) notifications_count from `companies` inner join `subscriptions` on `subscriptions`.`company_id` = `companies`.`id` inner join `account_managers` on `companies`.`account_manager_id` = `account_managers`.`id` left join notifications on (notifications.company_id = companies.id and notifications.dismissed_at is ? ) where `account_managers`.`accountancy_practice_id` = ? and (subscriptions.status <> ?) and (subscriptions.status <> ?) and (subscriptions.free_trial_expires_on is ? or subscriptions.free_trial_expires_on >= ?) group by companies.id order by companies.name limit ?")

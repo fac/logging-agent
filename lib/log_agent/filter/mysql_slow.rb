@@ -16,7 +16,7 @@ module LogAgent::Filter
     #
     def initialize sink, options = {}
       @options = options
-      @limit = options.fetch(:limit, 1024)
+      @limit = options.fetch(:limit, 20 * 1024)
       @event = {}
       super sink
     end
@@ -79,6 +79,7 @@ module LogAgent::Filter
     end
 
     def << event
+
       # Truncate the message if necessary
       if event.message.size > @limit
         event.fields['truncated'] = true
@@ -120,7 +121,7 @@ module LogAgent::Filter
           event.fields['database'] = @database
         end
 
-        event.fields['fingerprint'] = Digest::MD5.hexdigest(fingerprint(event.message))
+        event.fields['fingerprint'] = Digest::MD5.hexdigest(fingerprint(event.message)) unless event.fields['truncated']
 
         emit(event)
       end
