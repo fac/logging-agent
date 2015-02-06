@@ -5,7 +5,14 @@ describe LogAgent::Input::AMQP, "creation" do
 
   default_timeout 1.0
 
-  let(:channel) { AMQP::Channel.new }
+  let(:channel) do
+    AMQP::Channel.new.tap do |channel|
+      channel.on_error do |ch, channel_close|
+        raise "Channel level error: #{channel_close.reply_code} #{channel_close.reply_text}"
+      end
+
+    end
+  end
   let(:exchange) { channel.fanout("dev-logs-#{Time.now.to_f}") }
 
   let(:my_sink ) { mock("Sink", :<< => nil ) }
@@ -57,7 +64,7 @@ describe LogAgent::Input::AMQP, "creation" do
 
   describe "when a queue is specified" do
     let(:queue) { channel.queue('dev-queue', :durable => true, :arguments => {'x-expiry' => 1000} ) }
-    let(:input) { LogAgent::Input::AMQP.new(my_sink, channel, 'dev-logs', '#', queue) }
+    let(:input) { LogAgent::Input::AMQP.new(my_sink, channel, exchange.name, '#', queue) }
 
     amqp_before do
       queue.purge
@@ -70,7 +77,7 @@ describe LogAgent::Input::AMQP, "creation" do
 
     it "should still bind the queue to the exchange" do
       input.callback do
-        input.queue.bindings.first[:exchange].should == 'dev-logs'
+        input.queue.bindings.first[:exchange].should == exchange.name
         input.queue.bindings.first[:routing_key].should == '#'
         done
       end

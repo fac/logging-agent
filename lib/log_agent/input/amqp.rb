@@ -22,10 +22,10 @@ module LogAgent::Input
     # or called directly from init if we get an external queue
     def queue_ready(queue)
       @queue = queue
-      @queue.bind(@exchange, :routing_key => @routing_key) do |binding_ok|
-        @queue.subscribe(:ack => true, &method(:message_received))
+      @queue.bind(@exchange, :routing_key => @routing_key) do |bind_ok|
         self.succeed
       end
+      @queue.subscribe(:ack => true, &method(:message_received))
     end
 
     def message_received(header, payload)
