@@ -1,7 +1,7 @@
 module LogAgent::Filter
   class MultilineMessage < Base
     include LogAgent::LogHelper
-    
+
     attr_reader :options
     def initialize sink, options = {}
       @options = options
@@ -21,36 +21,21 @@ module LogAgent::Filter
       if @buffer
         debug "Adding event '#{event.uuid}' to the buffer"
         @buffer << event
-        
+
         if event.message =~ @end
           debug "End token reached in event '#{event.uuid}'. Reducing."
-          event = reduce(@buffer)
+          event = LogAgent::Event.reduce(@buffer)
           debug "Generated aggregate event '#{event.uuid}'"
           @buffer = nil
         else
           event = nil
         end
       end
-      
+
       if event
-        debug "Emitting '#{event.uuid}'" 
+        debug "Emitting '#{event.uuid}'"
         emit event
       end
-    end
-    
-    def reduce events
-      first_event = events.first
-      LogAgent::Event.new({
-        :uuid        => first_event.uuid,
-        :source_host => first_event.source_host,
-        :source_type => first_event.source_type, 
-        :source_path => first_event.source_path,
-        :tags        => first_event.tags,
-        :type        => first_event.type,
-        :timestamp   => first_event.timestamp,
-        :message     => events.collect { |event| event.message }.join("\n"),
-        :fields      => events.inject({}) { |out,event| out.merge!(event.fields) }
-      })
     end
   end
 end
