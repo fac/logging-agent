@@ -2,6 +2,7 @@ require 'time'
 require 'digest/md5'
 
 module LogAgent::Filter
+
   class MysqlSlow < Base
 
     include LogAgent::LogHelper
@@ -27,7 +28,8 @@ module LogAgent::Filter
     def initialize sink, options = {}
       @options = options
       @limit = options.fetch(:limit, 20 * 1024)
-      @event = {}
+      @events = []
+      @scanner = StringScanner.new("")
       super sink
     end
 
@@ -88,48 +90,85 @@ module LogAgent::Filter
       end
     end
 
-    def << event
+    def truncate_message(event)
       # Truncate the message if necessary
       if event.message.size > @limit
         event.fields['truncated'] = true
         event.fields['original_length'] = event.message.size
         event.message = event.message.slice(0, @limit)
       end
+    end
 
-      # Ignore comments ...
-      if event.message =~ /^#/
-        # ... but pick out metadata if we understand it
-        if event.message =~ /^# Time: (.*)$/
-          @timestamp = Time.parse($1).utc rescue nil
+    def parse_comment(message)
+      # ... but pick out metadata if we understand it
+      if message =~ /^# Time: (.*)$/
+        @timestamp = Time.parse($1).utc rescue nil
+      end
+
+      if message =~ /^# Query_time: (\d+)  Lock_time: (\d+)  Rows_sent: (\d+)  Rows_examined: (\d+)$/
+        @query_data = { "time" => $1.to_i, "lock_time" => $2.to_i, "rows_sent" => $3.to_i, "rows_examined" => $4.to_i }
+      end
+
+      if message =~ /^# User@Host: (.*)\[(.*)\] @  \[(.*)\]$/
+        @connection_data = { "user" => $1, "system_user" => $2, "host" => $3 }
+      end
+    end
+
+    # Buffered tokenizer, but working with events!
+    #
+    # Pro-tip (?=<blah) is a look-ahead match, so it checks that it's a
+    # new-line, followed by a comment, without actually eating the comment
+    # marker itself.
+    DELIMITER = /(.+;\n|^#.+\n|.+\n(?=#))/m
+
+    def extract(event)
+
+      # Argh, events are line-oriented and get chomped, but we need  different multi-line matches, o
+      # so lets add a newline back in!
+      event.message = "#{event.message}\n"
+      @events << event
+      @scanner.concat(event.message)
+
+      while match = @scanner.scan(DELIMITER)
+
+        event = if match == @scanner.string and match == event.message
+          event.tap { |e| e.message.chomp! }
+        else
+          LogAgent::Event.reduce(@events).tap { |e| e.message = match.chomp }
         end
 
-        if event.message =~ /^# Query_time: (\d+)  Lock_time: (\d+)  Rows_sent: (\d+)  Rows_examined: (\d+)$/
-          @query_data = { "time" => $1.to_i, "lock_time" => $2.to_i, "rows_sent" => $3.to_i, "rows_examined" => $4.to_i }
+        yield(event)
+
+        @events = []
+      end
+    end
+
+    def << event
+      # Skip lines that match the ignore matches
+      return if IGNORE_MATCHES.find { |r| event.message =~ r }
+
+      extract(event) do |event|
+        truncate_message(event)
+
+        # Ignore comments ...
+        if event.message =~ /^#/
+          parse_comment(event.message)
+        else
+          if @timestamp
+            event.timestamp = @timestamp
+          end
+          if @connection_data
+            event.fields['connection'] = @connection_data
+          end
+          if @query_data
+            event.fields['query'] = @query_data
+            @query_data = nil
+          end
+
+          event.fields['fingerprint'] = Digest::MD5.hexdigest(fingerprint(event.message)) unless event.fields['truncated']
+
+          emit(event)
         end
-
-        if event.message =~ /^# User@Host: (.*)\[(.*)\] @  \[(.*)\]$/
-          @connection_data = { "user" => $1, "system_user" => $2, "host" => $3 }
-        end
-
-
-      # Check if we should ignore this line.
-      elsif IGNORE_MATCHES.find { |r| event.message =~ r }
-
-      else
-        if @timestamp
-          event.timestamp = @timestamp
-        end
-        if @connection_data
-          event.fields['connection'] = @connection_data
-        end
-        if @query_data
-          event.fields['query'] = @query_data
-          @query_data = nil
-        end
-
-        event.fields['fingerprint'] = Digest::MD5.hexdigest(fingerprint(event.message)) unless event.fields['truncated']
-
-        emit(event)
       end
     end
   end

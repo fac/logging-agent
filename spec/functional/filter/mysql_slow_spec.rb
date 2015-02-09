@@ -21,10 +21,16 @@ describe LogAgent::Filter::MysqlSlow do
       events.map(&:message).should == ['foo;', 'bar;', 'baz;']
     end
 
-    it "should break queries on a semicolon rather than newline, up to the limit"
+    it "should break queries on a semicolon rather than newline, up to the limit" do
+      filter << LogAgent::Event.new(:message => "SELECT * from table")
+      filter << LogAgent::Event.new(:message => " where a = b and c = d")
+      filter << LogAgent::Event.new(:message => " order by widget_length;")
+      events.size.should == 1
+      events.map(&:message).first.should == "SELECT * from table\n where a = b and c = d\n order by widget_length;"
+    end
 
     it "should ignore the file headers" do
-      entry4
+      entry4_array.each { |e| filter << e }
       events.size.should == 1
       events.first.message.should =~ /^SELECT DISTINCT/
     end
@@ -39,6 +45,90 @@ describe LogAgent::Filter::MysqlSlow do
 
       events.map(&:message).should == ['foo;', 'bar;', 'baz;']
     end
+
+    describe "extract method" do
+      def e(message, fields={})
+        LogAgent::Event.new(fields.merge({:message => message}))
+      end
+
+      let(:out) { [] }
+
+      it "should emit on a single query on a single line" do
+        filter.extract(e("SELECT * FROM table;")) { |e| out << e.message }
+        out.should == ["SELECT * FROM table;"]
+      end
+
+      it "should a multi-line query upto a semicolon" do
+        filter.extract(e("SELECT * FROM table")) { |e| out << e.message }
+        out.should == []
+        filter.extract(e(" WHERE foo = bar;")) { |e| out << e.message }
+        out.should == ["SELECT * FROM table\n WHERE foo = bar;"]
+      end
+
+      it "should emit a commented line" do
+        filter.extract(e("SELECT * FROM table")) { |e| out << e.message }
+        out.should == []
+        filter.extract(e(" WHERE foo = bar;")) { |e| out << e.message }
+        out.should == ["SELECT * FROM table\n WHERE foo = bar;"]
+      end
+
+      it "should emit a commented line following a terminated query" do
+        filter.extract(e("SELECT * FROM table;\n# this is a comment")) { |e| out << e.message }
+        out.should == ["SELECT * FROM table;", "# this is a comment"]
+        filter.extract(e("# this is another comment")) { |e| out << e.message }
+        out.should == ["SELECT * FROM table;", "# this is a comment", "# this is another comment"]
+      end
+
+      it "should emit a commented line following an unterminated query" do
+        filter.extract(e("SELECT * FROM table")) { |e| out << e.message }
+        out.should == []
+        filter.extract(e("# this is a comment")) { |e| out << e.message }
+        out.should == ["SELECT * FROM table", "# this is a comment"]
+      end
+
+      it "should not blow up for SQL that contains a semicolon" do
+        filter.extract(e("SELECT * FROM table WHERE foo=';';")) { |e| out << e.message }
+        out.should == ["SELECT * FROM table WHERE foo=';';"]
+      end
+
+      it "should pass single-line events directly through" do
+        event = e("SELECT * FROM table;", :fields => {:foo => 'bar'})
+        filter.extract(event) { |e| out << e }
+        out.first.should == event
+      end
+
+      describe "metadata handling for multi line messages" do
+        let(:time) { Time.now }
+        before do
+          filter.extract(e("SELECT * FROM table", :timestamp => time, :fields => {:first => true, :foo => 'bar'})) { |e| out << e }
+          filter.extract(e(" WHERE foo = bar;", :timestamp => :another_time, :fields => {:foo => 'baz', :more => true})) { |e| out << e }
+        end
+
+        it "should take the event metadata from the first line" do
+          out.first.timestamp.should == time
+        end
+
+        it "should take the first lines fields" do
+          out.first.fields[:first].should == true
+        end
+
+        it "should merge in subsequent lines metadata" do
+          out.first.fields[:more].should == true
+        end
+
+        it "should merge the fields together" do
+          out.first.fields[:foo].should == 'baz'
+        end
+      end
+
+
+      describe "truncation" do
+        it "should handle it !"
+      end
+
+    end
+
+
 
     describe "limiting query length" do
       it "should default the limit to 20k bytes" do
@@ -62,7 +152,14 @@ describe LogAgent::Filter::MysqlSlow do
         event.fields['original_length'].should == 49
       end
 
-      it "should not skip the next commented line immediately following a truncated query line"
+      it "should not skip the next commented line immediately following a truncated query line" do
+        filter = LogAgent::Filter::MysqlSlow.new sink, :limit => 30
+        filter << LogAgent::Event.new(:message => "VERY LONG LINE!!!VERY LONG LINEVERY LONG LINEVERY LONG LINEVERY LONG LINEVERY LONG LINEVERY LONG LINEVERY LONG LINE")
+        filter << LogAgent::Event.new(:message => "# Time: 140231 15:05:29")
+        filter << LogAgent::Event.new(:message => "SELECT things from HERE;")
+        events.size.should == 2
+        events.last.timestamp.should == Time.local(2014, 02, 31, 15, 05, 29)
+      end
     end
 
     describe "Parsing the timestamp comment" do

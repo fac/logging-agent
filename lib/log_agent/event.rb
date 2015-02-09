@@ -13,7 +13,7 @@ module LogAgent
         messages.join("\n")
       end
 
-      first_event = events.first
+      first_event = events.first || LogAgent::Event.new
       LogAgent::Event.new({
         :uuid        => first_event.uuid,
         :source_host => first_event.source_host,
