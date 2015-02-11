@@ -206,6 +206,20 @@ describe LogAgent::Filter::MysqlSlow do
         events.first.fields['query'].should be_nil
       end
 
+      it "should parse the MySQL 5.1 format timing comment" do
+        filter << LogAgent::Event.new(:message => "# Time: 150211 10:38:26")
+        filter << LogAgent::Event.new(:message => "# User@Host: root[root] @ localhost []")
+        filter << LogAgent::Event.new(:message => "# Query_time: 12.979246  Lock_time: 0.000331 Rows_sent: 50  Rows_examined: 100")
+        filter << LogAgent::Event.new(:message => "SET timestamp=1423651332;")
+        filter << LogAgent::Event.new(:message => "select sleep(5);")
+        events.first.message.should == "select sleep(5);"
+        events.first.timestamp.should == Time.at(1423651332)
+        events.first.fields['query']['time'].should == 12.979246
+        events.first.fields['query']['lock_time'].should == 0.000331
+        events.first.fields['query']['rows_sent'].should == 50
+        events.first.fields['query']['rows_examined'].should == 100
+      end
+
       it "should attach the data to the next request" do
         filter << LogAgent::Event.new(:message => "# Query_time: 100  Lock_time: 50  Rows_sent: 20  Rows_examined: 322814")
         filter << LogAgent::Event.new(:message => "SELECT name FROM animals WHERE noise = 'moo';")
@@ -213,7 +227,6 @@ describe LogAgent::Filter::MysqlSlow do
         events.first.fields['query']['lock_time'].should == 50
         events.first.fields['query']['rows_sent'].should == 20
         events.first.fields['query']['rows_examined'].should == 322814
-
       end
 
       it "should not attach the same data to more than one request" do
