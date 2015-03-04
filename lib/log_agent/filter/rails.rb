@@ -12,6 +12,11 @@ module LogAgent::Filter
         event.fields['rails_remote_addr'] = $3 
       end
 
+      # Company #{new_track.company_id} just completed flying start task #{new_track.name}
+      if event.message =~ /^Company ([0-9]+) just completed flying start task (.+)/
+        event.fields["flying_start_company_id"] = $1
+        event.fields["flying_start_task_completed"] = $2
+      end
 
       if event.message =~ /Processing by ([^#]+)#([^\s]+) as ([^\s]*)/
         event.fields['rails_controller'] = $1

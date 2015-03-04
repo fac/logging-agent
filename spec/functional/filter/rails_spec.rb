@@ -211,6 +211,11 @@ describe LogAgent::Filter::Rails do
 
       entry6.fields['rails_queries'].should == { "total" => 0 }
     end
+
+    it "should parse flying start event correctly" do
+      entry8.fields["flying_start_company_id"].should == "69"
+      entry8.fields["flying_start_task_completed"].should == "awesome task"
+    end
   end
 end
 

@@ -97,6 +97,7 @@ Gem::Specification.new do |s|
     spec/data/rails_entries/entry5.log
     spec/data/rails_entries/entry6.log
     spec/data/rails_entries/entry7.log
+    spec/data/rails_entries/entry8.log
     spec/data/rails_multiline_message_entries/log_file1.log
     spec/data/ruby_log_formatter_entries/entry1.log
     spec/data/ruby_log_formatter_entries/entry2.log
