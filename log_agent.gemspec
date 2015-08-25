@@ -97,6 +97,7 @@ Gem::Specification.new do |s|
     spec/data/rails_entries/entry5.log
     spec/data/rails_entries/entry6.log
     spec/data/rails_entries/entry7.log
+    spec/data/rails_entries/entry8.log
     spec/data/rails_multiline_message_entries/log_file1.log
     spec/data/ruby_log_formatter_entries/entry1.log
     spec/data/ruby_log_formatter_entries/entry2.log
@@ -137,6 +138,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'json', '~> 1.5.4'
   s.add_runtime_dependency 'daemons', '~> 1.1.8'
   s.add_runtime_dependency 'eventmachine-tail', '~> 0.6.3'
+  s.add_runtime_dependency 'amq-protocol', '1.9.2'
 
   s.add_development_dependency 'rspec'
   s.add_development_dependency 'evented-spec'
