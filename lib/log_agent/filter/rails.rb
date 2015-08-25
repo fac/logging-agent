@@ -100,10 +100,6 @@ module LogAgent::Filter
         composed_data.each do |field,value|
           # Do not add pid, already taken care of else where
           next if field == "pid"
-          # If it is a positive value drop the sign
-          if value =~ /^\+/
-            value = value[1..-1]
-          end
           event.fields[field] = value.to_i
         end
       end
