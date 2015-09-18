@@ -1,5 +1,6 @@
 require 'time'
 require 'digest/md5'
+require 'strscan'
 
 module LogAgent::Filter
   class MysqlSlow < Base
