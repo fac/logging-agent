@@ -1,10 +1,9 @@
 require 'uuid'
-require 'socket'
 
 module LogAgent
   class Event
     include LogAgent::LogHelper
-    
+
     attr_reader :source_type, :source_host, :source_path, :uuid
     attr_accessor :tags, :fields
     attr_accessor :type, :message, :message_format, :timestamp, :captured_at
@@ -14,7 +13,7 @@ module LogAgent
       @uuid = opts[:uuid] || UUID.generate
       @type = opts[:type] || ""
       @source_type = opts[:source_type] || ""
-      @source_host = opts[:source_host] || Socket.gethostname 
+      @source_host = opts[:source_host] || LogAgent.hostname
       @source_path = opts[:source_path] || ""
       @tags = opts[:tags] || []
       @message = opts[:message] || ""
@@ -23,11 +22,11 @@ module LogAgent
       @fields = opts[:fields] || {}
       debug "Event '#{@uuid}' created"
     end
-    
+
     def message_format= new_format
       @message_format = new_format
     end
-    
+
     def message
       if @message_format
         @message_format.dup.tap do |message|
@@ -46,12 +45,12 @@ module LogAgent
         @message
       end
     end
-    
+
     def message= new_message
       raise RuntimeError, "message is immutable when message_format is set" if @message_format
       @message = new_message
     end
-    
+
     def to_payload
       debug "Dumping event '#{@uuid}' to payload:"
       JSON.dump({
@@ -63,11 +62,11 @@ module LogAgent
         '@fields'       => self.fields,
         '@message'      => self.message,
         '@tags'         => self.tags,
-        '@type'         => self.type, 
+        '@type'         => self.type,
         '@uuid'         => self.uuid
       }).tap { |json| debug json }
     end
-    
+
     def self.from_payload(json)
       data = JSON.load(json)
       new({

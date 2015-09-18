@@ -11,7 +11,7 @@ describe LogAgent::Event, "behaviour" do
     :source_path => "/test/abc1.log"
   })}
   let(:empty_event) { LogAgent::Event.new}
-  
+
   describe "captured_at" do
     it "should default to Time.now" do
       Timecop.freeze do
@@ -36,7 +36,7 @@ describe LogAgent::Event, "behaviour" do
       event.uuid.should_not be_nil
     end
   end
-  
+
   describe "type" do
     it "should default to blank" do
       empty_event.type.should == ''
@@ -49,7 +49,7 @@ describe LogAgent::Event, "behaviour" do
       event.type.should == 'nginx-access2'
     end
   end
-  
+
   describe "fields" do
     it "should have a #fields accessor that behaves like a hash" do
       event.fields['foo'].should == 'bar'
@@ -67,7 +67,7 @@ describe LogAgent::Event, "behaviour" do
       event.fields["foo"].should == 'bar'
     end
   end
-  
+
   describe "the timestamp" do
     it "should have a timestamp accessor" do
       event.timestamp.should == test_timestamp
@@ -76,7 +76,7 @@ describe LogAgent::Event, "behaviour" do
       empty_event.timestamp.should be_a(Time)
     end
   end
-  
+
   describe "the message" do
     it "should have a message accessor, returning a string" do
       event.message = "Foo bar baz"
@@ -85,7 +85,7 @@ describe LogAgent::Event, "behaviour" do
     it "should default the message to a blank string if not provided" do
       empty_event.message.should == ''
     end
-    
+
     describe "with a message format set" do
       it "should pull in the message format from the init options" do
         LogAgent::Event.new({ :message_format => "foo" }).message_format.should == "foo"
@@ -129,14 +129,14 @@ describe LogAgent::Event, "behaviour" do
         event.message_format = '%{@source_type} ! %{@source_host} ! %{@source_path}'
         event.message.should == "file ! #{Socket.gethostname} ! /test/abc1.log"
       end
-      
+
       it "should replace type with the type" do
         event.message_format = 'type=%{@type}'
         event.message.should == 'type=nginx-access'
       end
     end
   end
-  
+
   describe "tags" do
     it "should default to an empty hash" do
       empty_event.tags.should == []
@@ -154,8 +154,16 @@ describe LogAgent::Event, "behaviour" do
       event.tags.should include('b')
     end
   end
-  
+
   describe "source" do
+
+    it "should default the source_host to the configured value if set" do
+      LogAgent.hostname = "foobar"
+      LogAgent::Event.new.source_host.should == "foobar"
+      LogAgent.hostname = nil
+      LogAgent::Event.new.source_host.should == Socket.gethostname
+    end
+
     it "should default the source_host to the local hostname" do
       empty_event.source_host.should == Socket.gethostname
       event.source_host.should == Socket.gethostname
@@ -177,7 +185,7 @@ describe LogAgent::Event, "behaviour" do
 
   describe "Event.from_payload" do
     let(:loaded) { LogAgent::Event.from_payload(event.to_payload) }
-    
+
     it "should return an Event object" do
       loaded.should be_a(LogAgent::Event)
     end
@@ -188,7 +196,7 @@ describe LogAgent::Event, "behaviour" do
         LogAgent::Event.from_payload(payload).captured_at.should == Time.now
       end
     end
-    
+
     it "should load the object even if @timestamp isn't present" do
       Timecop.freeze do
         payload = JSON.dump(JSON.load(event.to_payload).tap { |hash| hash.delete("@timestamp") })
@@ -205,7 +213,7 @@ describe LogAgent::Event, "behaviour" do
       Socket.stub!(:gethostname => "a.n.other.host")
       loaded.source_host.should == event.source_host
     end
-    
+
     it "should load the @source_type field" do
       loaded.source_type.should == event.source_type
     end
@@ -236,7 +244,7 @@ describe LogAgent::Event, "behaviour" do
 
   describe "to_payload" do
     let(:json_out) { JSON.load(event.to_payload) }
-    
+
     it "should write the @timestamp as an iso8601(6) field" do
       json_out['@timestamp'].should == event.timestamp.iso8601(6)
     end
@@ -274,5 +282,5 @@ describe LogAgent::Event, "behaviour" do
       json_out['@uuid'].should == event.uuid
     end
   end
-  
+
 end
