@@ -36,7 +36,7 @@ module LogAgent::Input
         end
       end
     rescue JSON::ParserError
-      warn("Failed to load JSON message")
+      warn("Failed to load JSON message: #{$!.message}")
       header.reject(:requeue => false)
     rescue
       warn("Exception handling AMQP message: #{$!.message}")

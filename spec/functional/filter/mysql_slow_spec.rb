@@ -35,8 +35,8 @@ describe LogAgent::Filter::MysqlSlow do
     end
 
     describe "limiting query length" do
-      it "should default the limit to 1024 bytes" do
-        filter.limit.should == 1024
+      it "should default the limit to 20k bytes" do
+        filter.limit.should == 20 * 1024
       end
 
       it "should truncate lines to the limit parameter, if they exceed it" do
@@ -185,6 +185,11 @@ describe LogAgent::Filter::MysqlSlow do
     end
 
     describe "query fingerprint calculation" do
+
+      it "should not report a fingerprint if the query is truncated" do
+        LogAgent::Filter::MysqlSlow.new(sink, :limit => 5) << LogAgent::Event.new(:message => "Select * from foobarbaz;")
+        events.first.fields['fingerprint'].should be_nil
+      end
 
       it "should attach the fingerprint of all queries" do
         filter << LogAgent::Event.new(:message => "SELECT  companies.*, COUNT(notifications.id) notifications_count FROM `companies` INNER JOIN `subscriptions` ON `subscriptions`.`company_id` = `companies`.`id` INNER JOIN `account_managers` ON `companies`.`account_manager_id` = `account_managers`.`id` LEFT JOIN notifications ON (notifications.company_id = companies.id AND notifications.dismissed_at IS NULL ) WHERE `account_managers`.`accountancy_practice_id` = 11789 AND (subscriptions.status <> 'Cancelled') AND (subscriptions.status <> 'Suspended') AND (subscriptions.free_trial_expires_on IS NULL OR subscriptions.free_trial_expires_on >= '2014-04-21') GROUP BY companies.id ORDER BY companies.name ASC LIMIT 30 OFFSET 0;")
