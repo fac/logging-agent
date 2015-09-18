@@ -1,7 +1,7 @@
 module LogAgent::Filter
 
 
-  # This is a specific Rails multiline message filter, building on the 
+  # This is a specific Rails multiline message filter, building on the
   class RailsMultilineMessage < MultilineMessage
 
     attr_reader :max_time, :max_size
@@ -52,7 +52,7 @@ module LogAgent::Filter
           @event = event
           @current_request_id = request_id
         else
-          @event = reduce([@event,event])
+          @event = LogAgent::Event.reduce([@event,event])
         end
 
         if @event.message =~ COMPLETION_REGEXP || @event.message.length >= @max_size

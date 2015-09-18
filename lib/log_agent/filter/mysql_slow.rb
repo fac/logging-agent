@@ -6,6 +6,13 @@ module LogAgent::Filter
 
     include LogAgent::LogHelper
 
+    IGNORE_MATCHES = [
+      # Ignore the header at the start of the file
+      /.+, Version: .+ started with\:$/,
+      /^Tcp port\: .+ Unix socket\:/,
+      /^Time\s+Id\s+Command\s+Argument$/,
+    ]
+
     attr_reader :limit
 
     # Creates the slow query logger with given options:
@@ -17,7 +24,8 @@ module LogAgent::Filter
     def initialize sink, options = {}
       @options = options
       @limit = options.fetch(:limit, 20 * 1024)
-      @event = {}
+      @events = []
+      @scanner = StringScanner.new("")
       super sink
     end
 
@@ -78,55 +86,95 @@ module LogAgent::Filter
       end
     end
 
-    def << event
+    def truncate_message(event)
       # Truncate the message if necessary
       if event.message.size > @limit
         event.fields['truncated'] = true
         event.fields['original_length'] = event.message.size
         event.message = event.message.slice(0, @limit)
       end
+    end
 
-      # Ignore comments ...
-      if event.message =~ /^#/
-        # ... but pick out metadata if we understand it
-        if event.message =~ /^# Time: (.*)$/
-          @timestamp = Time.parse($1).utc rescue nil
+    def parse_comment(message)
+      # ... but pick out metadata if we understand it
+      if message =~ /^# Time: (.*)$/
+        @timestamp = Time.parse($1).utc rescue nil
+      end
+
+      if message =~ /^#\s+Query_time:\s+([\d.]+)\s+Lock_time:\s+([\d.]+)\s+Rows_sent:\s+(\d+)\s+Rows_examined:\s+(\d+)$/
+        @query_data = { "time" => $1.to_f, "lock_time" => $2.to_f, "rows_sent" => $3.to_i, "rows_examined" => $4.to_i }
+      end
+
+      if message =~ /^# User@Host: (.*)\[(.*)\] @  \[(.*)\]$/
+        @connection_data = { "user" => $1, "system_user" => $2, "host" => $3 }
+      end
+    end
+
+    # Buffered tokenizer, but working with events!
+    #
+    # Pro-tip (?=<blah) is a look-ahead match, so it checks that it's a
+    # new-line, followed by a comment, without actually eating the comment
+    # marker itself.
+    DELIMITER = /(.+;\n|^#.+\n|.+\n(?=#))/m
+    def extract(event)
+
+      # Argh, events are line-oriented and get chomped, but we need  different multi-line matches, o
+      # so lets add a newline back in!
+      event.message = "#{event.message}\n"
+      @events << event
+      @scanner.concat(event.message)
+
+      while match = @scanner.scan(DELIMITER)
+
+        event = if match == @scanner.string and match == event.message
+          event.tap { |e| e.message.chomp! }
+        else
+          LogAgent::Event.reduce(@events).tap { |e| e.message = match.chomp }
         end
 
-        if event.message =~ /^#\s+Query_time:\s+([\d.]+)\s+Lock_time:\s+([\d.]+)\s+Rows_sent:\s+(\d+)\s+Rows_examined:\s+(\d+)$/
-          @query_data = { "time" => $1.to_f, "lock_time" => $2.to_f, "rows_sent" => $3.to_i, "rows_examined" => $4.to_i }
-        end
+        yield(event)
 
-        if event.message =~ /^# User@Host: (.*)\[(.*)\] @  \[(.*)\]$/
-          @connection_data = { "user" => $1, "system_user" => $2, "host" => $3 }
-        end
+        @events = []
+      end
+    end
 
-      # ignore use ...; statements, but grab the database
-      elsif event.message =~ /^use (.*);$/i
-        @database = $1
+    def << event
+      # Skip lines that match the ignore matches
+      return if IGNORE_MATCHES.find { |r| event.message =~ r }
 
-      elsif event.message =~ /^set timestamp=(\d+);$/i
-        # Manually handle SET timestamp=<\d> messages
-        @timestamp = Time.at($1.to_i)
+      extract(event) do |event|
 
-      else
-        if @timestamp
-          event.timestamp = @timestamp
-        end
-        if @connection_data
-          event.fields['connection'] = @connection_data
-        end
-        if @query_data
-          event.fields['query'] = @query_data
-          @query_data = nil
-        end
-        if @database
-          event.fields['database'] = @database
-        end
+        truncate_message(event)
 
-        event.fields['fingerprint'] = Digest::MD5.hexdigest(fingerprint(event.message)) unless event.fields['truncated']
+        # Ignore comments ...
+        if event.message =~ /^#/
+          parse_comment(event.message)
 
-        emit(event)
+        elsif event.message =~ /^set timestamp=(\d+);$/i
+          # Manually handle SET timestamp=<\d> messages
+          @timestamp = Time.at($1.to_i)
+
+        # ignore use ...; statements, but grab the database
+        elsif event.message =~ /^use (.*);$/i
+          @database = $1
+
+        elsif event.message =~ /^set timestamp=(\d+);$/i
+          # Manually handle SET timestamp=<\d> messages
+          @timestamp = Time.at($1.to_i)
+
+        else
+          if @query_data
+            event.fields['query'] = @query_data
+            @query_data = nil
+          end
+
+          event.timestamp = @timestamp if @timestamp
+          event.fields['connection'] = @connection_data if @connection_data
+          event.fields['database'] = @database if @database
+          event.fields['fingerprint'] = Digest::MD5.hexdigest(fingerprint(event.message)) unless event.fields['truncated']
+
+          emit(event)
+        end
       end
     end
   end

@@ -8,6 +8,26 @@ module LogAgent
     attr_accessor :tags, :fields
     attr_accessor :type, :message, :message_format, :timestamp, :captured_at
 
+    def self.reduce(events, &reducer)
+      reducer ||= lambda do |messages|
+        messages.join("\n")
+      end
+
+      first_event = events.first || LogAgent::Event.new
+      LogAgent::Event.new({
+        :uuid        => first_event.uuid,
+        :source_host => first_event.source_host,
+        :source_type => first_event.source_type,
+        :source_path => first_event.source_path,
+        :tags        => first_event.tags,
+        :type        => first_event.type,
+        :timestamp   => first_event.timestamp,
+        :message     => reducer.call(events.map { |e| e.message }),
+        :fields      => events.inject({}) { |out,event| out.merge!(event.fields) }
+      })
+    end
+
+
     def initialize opts={}
       @captured_at = opts[:captured_at] || Time.now
       @uuid = opts[:uuid] || UUID.generate

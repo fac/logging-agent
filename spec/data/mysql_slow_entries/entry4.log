@@ -1,0 +1,8 @@
+/opt/local/libexec/mysqld, Version: 5.0.96-log (Source distribution). started with:
+Tcp port: 3306  Unix socket: /tmp/mysql.sock
+Time                 Id Command    Argument
+# Time: 150206 11:45:33
+# User@Host: freeagent[freeagent] @  [10.0.0.8]
+# Query_time: 4  Lock_time: 0  Rows_sent: 14388  Rows_examined: 445988
+use freeagent;
+SELECT DISTINCT aaa.id FROM `aaa` INNER JOIN `bbb` ON `bbb`.`company_id` = `aaa`.`id` WHERE `aaa`.`type` IN ('Foo', 'Bar', 'Baz', 'Abc', 'Def');
