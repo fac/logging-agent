@@ -93,8 +93,8 @@ module LogAgent::Filter
           @timestamp = Time.parse($1).utc rescue nil
         end
 
-        if event.message =~ /^# Query_time: (\d+)  Lock_time: (\d+)  Rows_sent: (\d+)  Rows_examined: (\d+)$/
-          @query_data = { "time" => $1.to_i, "lock_time" => $2.to_i, "rows_sent" => $3.to_i, "rows_examined" => $4.to_i }
+        if event.message =~ /^#\s+Query_time:\s+([\d.]+)\s+Lock_time:\s+([\d.]+)\s+Rows_sent:\s+(\d+)\s+Rows_examined:\s+(\d+)$/
+          @query_data = { "time" => $1.to_f, "lock_time" => $2.to_f, "rows_sent" => $3.to_i, "rows_examined" => $4.to_i }
         end
 
         if event.message =~ /^# User@Host: (.*)\[(.*)\] @  \[(.*)\]$/
@@ -104,6 +104,10 @@ module LogAgent::Filter
       # ignore use ...; statements, but grab the database
       elsif event.message =~ /^use (.*);$/i
         @database = $1
+
+      elsif event.message =~ /^set timestamp=(\d+);$/i
+        # Manually handle SET timestamp=<\d> messages
+        @timestamp = Time.at($1.to_i)
 
       else
         if @timestamp

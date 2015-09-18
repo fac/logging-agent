@@ -47,6 +47,3 @@ DEPENDENCIES
   log_agent!
   rspec
   timecop
-
-BUNDLED WITH
-   1.10.6
