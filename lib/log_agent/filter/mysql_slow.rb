@@ -136,6 +136,7 @@ module LogAgent::Filter
         yield(event)
 
         @events = []
+        @scanner.string = ""
       end
     end
 
