@@ -9,7 +9,7 @@ module LogAgent::Output
     
     def << event
       debug "Shipping event '#{event.uuid}'"
-      @exchange.publish(event.to_payload, :routing_key => "#{event.type}.#{event.source_host}") do 
+      @exchange.publish(event.to_payload, :routing_key => "#{event.type}.#{event.source_host}", :persistent => true) do
         yield if block_given?
       end
     end
