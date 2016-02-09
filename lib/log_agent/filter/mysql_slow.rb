@@ -126,7 +126,6 @@ module LogAgent::Filter
       @scanner.concat(event.message)
 
       while match = @scanner.scan(DELIMITER)
-
         event = if match == @scanner.string and match == event.message
           event.tap { |e| e.message.chomp! }
         else
@@ -136,7 +135,7 @@ module LogAgent::Filter
         yield(event)
 
         @events = []
-        @scanner.string = ""
+        @scanner.string = @scanner.string[match.length..-1]
       end
     end
 
