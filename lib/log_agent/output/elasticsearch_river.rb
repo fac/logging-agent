@@ -2,8 +2,8 @@ module LogAgent::Output
   class ElasticsearchRiver
     attr_reader :channel, :exchange, :routing_key
 
-    def initialize( channel, exchange, routing_key )
-      @channel, @routing_key = channel, routing_key
+    def initialize( channel, exchange, routing_key, persistent_msgs = true )
+      @channel, @routing_key, @persistent_msgs = channel, routing_key, persistent_msgs
       @exchange = if exchange.is_a? ::AMQP::Exchange
         exchange
       else
@@ -19,7 +19,7 @@ module LogAgent::Output
         "_id"         => event.uuid
       }}
 
-      @exchange.publish( [JSON.dump(action),event.to_payload,""].join("\n"), :routing_key => @routing_key ) do
+      @exchange.publish( [JSON.dump(action),event.to_payload,""].join("\n"), :routing_key => @routing_key, :persistent => @persistent_msgs ) do
         yield if block_given?
       end
     end

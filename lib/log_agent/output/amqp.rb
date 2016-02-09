@@ -5,7 +5,7 @@ module LogAgent::Output
     attr_reader :channel, :exchange, :persistent_msgs
     # Initialise AMQP output module
     #
-    # * channel - Bunny channle
+    # * channel - Bunny channel
     # * exchange - Bunny exchange
     # * persistent_msgs - Should messages survive a broker restart
     #   persistent_msgs defaults to true.
@@ -18,7 +18,7 @@ module LogAgent::Output
       @exchange.publish(
         event.to_payload,
         :routing_key => "#{event.type}.#{event.source_host}",
-        :persistent  => persistent_msgs
+        :persistent  => @persistent_msgs
       ) do
         yield if block_given?
       end
