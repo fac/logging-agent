@@ -133,7 +133,7 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
 
   s.add_runtime_dependency 'eventmachine', '~> 0.12.10'
-  s.add_runtime_dependency 'amqp', '~> 1.3'
+  s.add_runtime_dependency 'amqp', '~> 1.5.0'
   s.add_runtime_dependency 'uuid', '~> 2.3.5'
   s.add_runtime_dependency 'json', '~> 1.5.4'
   s.add_runtime_dependency 'daemons', '~> 1.1.8'
