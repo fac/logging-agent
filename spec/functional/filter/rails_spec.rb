@@ -226,11 +226,14 @@ describe LogAgent::Filter::Rails do
       entry8.fields['oldmalloc_bytes'].should == 377920
     end
 
-    it "should add the api app id to API requests" do
+    it "should add the api app and user id to API requests" do
       [entry1, entry2, entry3, entry4, entry5, entry6, entry7, entry8].each do |e|
         e.fields['rails_api_app_id'].should be_nil
       end
+
       entry9.fields['rails_api_app_id'].should == 894
+      entry9.fields['rails_api_user_id'].should == 75
+      entry9.fields['rails_api_user_type'].should == "User"
     end
   end
 end
