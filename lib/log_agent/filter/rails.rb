@@ -36,10 +36,16 @@ module LogAgent::Filter
         event.fields['rails_duration']['activerecord'] = $1.to_f
       end
 
-      if event.message =~ /^Dev Dashboard Response:.*:app_id=>(\d+),.*:user_id=>(\d+),.*:user_type=>"(User|AccountManager)/
+      if event.message =~ /^Dev Dashboard Response:.*:app_id=>(\d+),/
         event.fields['rails_api_app_id'] = $1.to_i
-        event.fields['rails_api_user_id'] = $2.to_i
-        event.fields['rails_api_user_type'] = $3
+      end
+
+      if event.message =~ /^Dev Dashboard Response:.*:user_id=>(\d+),/
+        event.fields['rails_api_user_id'] = $1.to_i
+      end
+
+      if event.message =~ /^Dev Dashboard Response:.*:user_type=>"(User|AccountManager)/
+        event.fields['rails_api_user_type'] = $1
       end
 
       if event.message =~ /^Started .* for .* at (\d+-\d+-\d+ \d+:\d+:\d+ \+\d+)/
