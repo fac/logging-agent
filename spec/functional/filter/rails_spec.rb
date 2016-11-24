@@ -4,7 +4,7 @@ require 'spec_helper'
 describe LogAgent::Filter::Rails do
   let(:sink) { mock("MySinkObject", :<< => nil) }
   let(:filter) { LogAgent::Filter::Rails.new sink }
-  
+
   it "should be created with new <sink>" do
     filter.sink.should == [sink]
   end
@@ -69,7 +69,7 @@ describe LogAgent::Filter::Rails do
         entry7.timestamp.should == fake_capture_time - (entry7.fields['rails_duration']['total'] / 1000)
       end
     end
-    
+
     it "should parse the method" do
       entry1.fields['rails_method'].should == 'GET'
       entry2.fields['rails_method'].should == 'GET'
@@ -96,7 +96,7 @@ describe LogAgent::Filter::Rails do
       entry5.fields['rails_remote_addr'].should == "80.2.3.4"
       entry6.fields['rails_remote_addr'].should == "90.1.2.3"
     end
-    
+
     it "should parse the controller" do
       entry1.fields['rails_controller'].should == "InvoiceItemsController"
       entry2.fields['rails_controller'].should == "SignupController"
@@ -136,7 +136,7 @@ describe LogAgent::Filter::Rails do
       entry4.fields['rails_redirect'].should == 'https://subdomain2.freeagentcentral.com/'
       entry5.fields['rails_redirect'].should be_nil
       entry6.fields['rails_redirect'].should be_nil
-      
+
     end
     it "should parse the views rendered" do
       entry1.fields['rails_rendered'].should == [{'name' => 'inline template', 'duration' => 0.5}]
@@ -179,7 +179,7 @@ describe LogAgent::Filter::Rails do
       entry5.fields['rails_duration'].should == {"total" => 12}
       entry6.fields['rails_duration'].should == {"total" => 133, "views" => 35.3, "activerecord" => 57.0}
     end
-    
+
     it "should parse the subdomain" do
       entry1.fields['rails_subdomain'].should == 'subdomain5'
       entry2.fields['rails_subdomain'].should be_nil
@@ -187,7 +187,7 @@ describe LogAgent::Filter::Rails do
       entry4.fields['rails_subdomain'].should == 'subdomain2'
       entry5.fields['rails_subdomain'].should == 'subdomain1'
       entry6.fields['rails_subdomain'].should == 'subdomain'
-      
+
     end
     it "should parse the login email" do
       entry1.fields['rails_login'].should be_nil
@@ -224,6 +224,13 @@ describe LogAgent::Filter::Rails do
       entry8.fields['total_slots'].should == 0
       entry8.fields['oldmalloc_bytes_total'].should == 12750672
       entry8.fields['oldmalloc_bytes'].should == 377920
+    end
+
+    it "should add the api app id to API requests" do
+      [entry1, entry2, entry3, entry4, entry5, entry6, entry7, entry8].each do |e|
+        e.fields['rails_api_app_id'].should be_nil
+      end
+      entry9.fields['rails_api_app_id'].should == 894
     end
   end
 end

@@ -1,0 +1,8 @@
+Started GET "/v2/company.json" for 107.178.194.25 at 2016-11-24 14:22:04 +0000
+Processing by Api::CompanyController#show as JSON
+Authenticating with access token
+Dev Dashboard Response: {:app_id=>894, :app_name=>"Test App", :practice_enabled=>false, :used_token_id=>58786042, :used_token_type=>"AccessToken", :environment=>"integration", :user_id=>75, :user_type=>"User"}
+ActiveRecord: 5 SELECT queries
+ActiveRecord: 2 SELECT_CACHED queries
+GC stats (6231):11 (+0) major, 30 (+0) minor, 9198 allocations, 1911934 (-254) live slots, 1913225 (+0) total slots, 3499480 (+21352) memory
+Completed 200 OK in 112ms (Views: 32.1ms | ActiveRecord: 11.4ms)

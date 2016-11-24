@@ -9,7 +9,7 @@ module LogAgent::Filter
       if event.message =~ /^Started ([^\s]+) \"([^\"]+)\" for (\d+\.\d+\.\d+\.\d+)/
         event.fields['rails_method'] = $1
         event.fields['rails_request_path'] = $2
-        event.fields['rails_remote_addr'] = $3 
+        event.fields['rails_remote_addr'] = $3
       end
 
 
@@ -34,6 +34,10 @@ module LogAgent::Filter
 
       if event.message =~ /^Completed .*ActiveRecord: ([\d.]+)ms/
         event.fields['rails_duration']['activerecord'] = $1.to_f
+      end
+
+      if event.message =~ /^Dev Dashboard Response:.*:app_id=>(\d+),/
+        event.fields['rails_api_app_id'] = $1.to_i
       end
 
       if event.message =~ /^Started .* for .* at (\d+-\d+-\d+ \d+:\d+:\d+ \+\d+)/
