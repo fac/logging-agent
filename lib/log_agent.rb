@@ -20,6 +20,7 @@ module LogAgent
     autoload 'Grep',                  'log_agent/filter/grep'
     autoload 'MultilineMessage',      'log_agent/filter/multiline_message'
     autoload 'Rails',                 'log_agent/filter/rails'
+    autoload 'GcStats',               'log_agent/filter/gc_stats'
     autoload 'Barnyard',              'log_agent/filter/barnyard'
     autoload 'Ossec',                 'log_agent/filter/ossec'
     autoload 'PtDeadlock',            'log_agent/filter/pt_deadlock'

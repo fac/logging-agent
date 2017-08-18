@@ -212,20 +212,6 @@ describe LogAgent::Filter::Rails do
       entry6.fields['rails_queries'].should == { "total" => 0 }
     end
 
-    it "should add the GC stats as fields" do
-      entry8.fields['major_gc_total'].should == 190
-      entry8.fields['major_gc'].should == 0
-      entry8.fields['minor_gc_total'].should == 1353
-      entry8.fields['minor_gc'].should == 0
-      entry8.fields['object_allocations'].should == 8398
-      entry8.fields['live_slots_total'].should == 1877377
-      entry8.fields['live_slots'].should == 8398
-      entry8.fields['total_slots_total'].should == 2625715
-      entry8.fields['total_slots'].should == 0
-      entry8.fields['oldmalloc_bytes_total'].should == 12750672
-      entry8.fields['oldmalloc_bytes'].should == 377920
-    end
-
     it "should add the api app and user id to API requests" do
       [entry1, entry2, entry3, entry4, entry5, entry6, entry7, entry8].each do |e|
         e.fields['rails_api_app_id'].should be_nil
@@ -237,4 +223,3 @@ describe LogAgent::Filter::Rails do
     end
   end
 end
-
