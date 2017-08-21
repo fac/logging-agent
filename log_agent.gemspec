@@ -21,6 +21,7 @@ Gem::Specification.new do |s|
     lib/log_agent/filter/ossec.rb
     lib/log_agent/filter/barnyard.rb
     lib/log_agent/filter/base.rb
+    lib/log_agent/filter/gc_stats.rb
     lib/log_agent/filter/grep.rb
     lib/log_agent/filter/multiline_message.rb
     lib/log_agent/filter/pt_deadlock.rb
@@ -60,6 +61,7 @@ Gem::Specification.new do |s|
     spec/functional/filter/barnyard_spec.rb
     spec/functional/filter/ossec_spec.rb
     spec/functional/filter/base_spec.rb
+    spec/functional/filter/gc_stats_spec.rb
     spec/functional/filter/grep_spec.rb
     spec/functional/filter/multiline_message_spec.rb
     spec/functional/filter/rails_spec.rb
@@ -144,4 +146,3 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'evented-spec'
   s.add_development_dependency 'timecop'
 end
-
