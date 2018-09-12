@@ -8,15 +8,15 @@ def tasks = [:]
 
 freeagent(node: 'smartos', slack: [channel: '#ops-ci']) {
   parallel centos: {
-    node('centos') {
-      sh "chruby system"
+    node('centos_2.3.7') {
+      sh "chruby ruby 2.3.7"
       sh "bundle install"
       sh "bundle exec rake"
     }
   },
   smartos: {
-    node('smartos') {
-      sh "chruby system"
+    node('smartos_2.3.7') {
+      sh "chruby ruby 2.3.7"
       sh "bundle install"
       sh "bundle exec rake"
     }
