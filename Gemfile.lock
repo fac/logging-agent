@@ -26,6 +26,7 @@ GEM
     json (1.5.5)
     macaddr (1.7.1)
       systemu (~> 2.6.2)
+    rake (11.3.0)
     rspec (2.8.0)
       rspec-core (~> 2.8.0)
       rspec-expectations (~> 2.8.0)
@@ -45,6 +46,7 @@ PLATFORMS
 DEPENDENCIES
   evented-spec
   log_agent!
+  rake (~> 11)
   rspec
   timecop
 
