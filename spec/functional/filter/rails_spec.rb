@@ -45,7 +45,7 @@ describe LogAgent::Filter::Rails do
     #
     it "should use the captured_at field if it is within 1 second of the timestamp" do
       Timecop.freeze(Time.parse('2012-03-04 00:01:22.12345 UTC')) do
-        entry1.timestamp.utc.to_f.should == 1330819282.1114502  # 0.12345 - 0.012
+        entry1.timestamp.utc.to_f.should == 1330819282.11145  # 0.12345 - 0.012
       end
     end
 

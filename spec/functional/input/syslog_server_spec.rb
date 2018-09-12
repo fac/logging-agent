@@ -3,7 +3,7 @@ require 'spec_helper'
 describe LogAgent::Input::SyslogServer do
   include EventedSpec::EMSpec
 
-  let(:sink) { mock("FileTailSink", :<< => nil) }  
+  let(:sink) { mock("FileTailSink", :<< => nil) }
   let(:syslog_server) { LogAgent::Input::SyslogServer.new sink, :port => 9977, :tags => ['tag_a', 'tag_b'] }
 
   let(:source) { EventMachine.open_datagram_socket('127.0.0.1', 0) }
@@ -13,7 +13,7 @@ describe LogAgent::Input::SyslogServer do
   end
 
   it "should emit a callback" do
-    syslog_server.callback do 
+    syslog_server.callback do
       done
     end
   end
@@ -21,7 +21,7 @@ describe LogAgent::Input::SyslogServer do
     sink.should_receive(:<<) { done }
     source.send_datagram('foobar', '127.0.0.1', 9977)
   end
-  
+
   it "should set the tags on outgoing messages" do
     syslog_server.parse('foo bar').tags.should == ['tag_a', 'tag_b']
     done
@@ -40,7 +40,7 @@ describe LogAgent::Input::SyslogServer do
 
   describe "Input::SyslogServer#parse, handling examples from RFC5424" do
     let(:example1) { syslog_server.parse("<34>1 2003-10-11T22:14:15.003Z mymachine.example.com su - ID47 - 'su root' failed for lonvick on /dev/pts/8") }
-    # 
+    #
     # In this example, the VERSION is 1 and the Facility has the value of
     # 4.  The Severity is 2.  The message was created on 11 October 2003 at
     # 10:14:15pm UTC, 3 milliseconds into the next second.  The message
@@ -96,7 +96,7 @@ describe LogAgent::Input::SyslogServer do
       done
     end
     it "should set a message format" do
-      example2.message.should == "Aug 24 13:14:15 192.0.2.1 myproc[8710]: %% It's time to make the do-nuts."
+      example2.message.should == "Aug 24 12:14:15 192.0.2.1 myproc[8710]: %% It's time to make the do-nuts."
       done
     end
 
@@ -153,7 +153,7 @@ describe LogAgent::Input::SyslogServer do
       done
     end
   end
-  
+
   describe "SyslogServer#parse for the servers' format from rsyslog" do
     describe "for syslog entries with process-ids values" do
       let(:example1) { syslog_server.parse("<86>Feb  12 21:04:59 web1.server.net sshd[1576]: Received disconnect from 10.0.0.1: 11: disconnected by user") }
@@ -223,9 +223,9 @@ describe LogAgent::Input::SyslogServer do
         example.fields['syslog_message'].should == 'pam_unix(su:auth): authentication failure; logname=thomas uid=2005 euid=0 tty=pts/1 ruser=thomas rhost=  user=root'
         done
       end
-      
+
     end
   end
-  
+
 end
 
