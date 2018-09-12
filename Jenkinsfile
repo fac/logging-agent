@@ -7,16 +7,18 @@ def tasks = [:]
 @Library('freeagent') _
 
 freeagent(node: 'smartos', slack: [channel: '#ops-ci']) {
-  parallel centos: {
-    node('centos_2.3.7') {
-      sh "chruby ruby 2.3.7"
+  parallel centos237: {
+    node('centos') {
+      checkout scm
+      sh "chruby 2.3.7"
       sh "bundle install"
       sh "bundle exec rake"
     }
   },
-  smartos: {
-    node('smartos_2.3.7') {
-      sh "chruby ruby 2.3.7"
+  smartos237: {
+    node('smartos') {
+      checkout scm
+      sh "chruby 2.3.7"
       sh "bundle install"
       sh "bundle exec rake"
     }
