@@ -1,14 +1,7 @@
 README
 ======
 
-Steps to build a gem:
+This process resides on all servers scraping logs from various sources and pushes them to outputs.
 
-1. ensure the gemspec correctly reflects any added or removed files.
+WARNING: Be careful when merging and version bumping - as soon as Jenkins sees a new version on the `master` branch, it will merge and push and Puppet will then install this version automatically.
 
-2. bump the version in lib/log_agent/version.rb according to semantic versioning
-
-3. commit and push to github
-
-4. gem build log_agent.gemspec which will kick out the gem file
-
-5. copy this into puppet-config:modules/logging/files/log_agent.gem
