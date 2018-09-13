@@ -9,8 +9,8 @@ def build_process(node_spec, ruby_spec) {
   { ->
     node(node_spec) {
       checkout scm
-      sh "chruby-exec $ruby_spec -- bundle install --path .bundle"
-      sh "chruby-exec $ruby_spec -- bundle exec rake"
+      sh "chruby $ruby_spec && bundle install --path .bundle"
+      sh "chruby $ruby_spec && bundle exec rake"
     }
   }
 }
