@@ -1,0 +1,1 @@
+Skipping my_database.my_table because SHOW CREATE TABLE failed: DBD::mysql::db do failed: MySQL server has gone away [for Statement "USE `my_database`"] at /opt/local/bin/pt-table-checksum line 4369.

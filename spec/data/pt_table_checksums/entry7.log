@@ -1,0 +1,1 @@
+10-17T00:31:09 Skipping chunk 14 of my_database.my_table because DBD::mysql::st execute failed: Lock wait timeout exceeded

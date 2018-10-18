@@ -24,6 +24,7 @@ module LogAgent
     autoload 'Barnyard',              'log_agent/filter/barnyard'
     autoload 'Ossec',                 'log_agent/filter/ossec'
     autoload 'PtDeadlock',            'log_agent/filter/pt_deadlock'
+    autoload 'PtTableChecksum',       'log_agent/filter/pt_table_checksum'
     autoload 'RubyLogFormatter',      'log_agent/filter/ruby_log_formatter'
     autoload 'RailsMultilineMessage', 'log_agent/filter/rails_multiline_message'
     autoload 'PidDemuxer',            'log_agent/filter/pid_demuxer'
