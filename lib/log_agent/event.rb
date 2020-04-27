@@ -4,7 +4,8 @@ module LogAgent
   class Event
     include LogAgent::LogHelper
 
-    attr_reader :source_type, :source_host, :source_path, :uuid
+    attr_reader :uuid
+    attr_accessor :source_type, :source_host, :source_path
     attr_accessor :tags, :fields
     attr_accessor :type, :message, :message_format, :timestamp, :captured_at
 
