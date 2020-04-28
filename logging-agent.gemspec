@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.test_files    = s.files.grep(%r{^(test|spec|features)/})
   s.require_paths = ["lib"]
 
-  s.add_runtime_dependency 'eventmachine', '~> 1.2'
+  s.add_runtime_dependency 'eventmachine', '~> 0.12.10'
   s.add_runtime_dependency 'amqp', '~> 1.5.0'
   s.add_runtime_dependency 'uuid', '~> 2.3.5'
   s.add_runtime_dependency 'json', '~> 1.5.4'
