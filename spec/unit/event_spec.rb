@@ -176,11 +176,6 @@ describe LogAgent::Event, "behaviour" do
       empty_event.source_type.should == ''
       event.source_type.should == 'file'
     end
-    it "should be immutable" do
-      lambda { event.source_type = 'fish' }.should raise_error
-      lambda { event.source_path = 'fish' }.should raise_error
-      lambda { event.source_host = 'fish' }.should raise_error
-    end
   end
 
   describe "Event.from_payload" do
