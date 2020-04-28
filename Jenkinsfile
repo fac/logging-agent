@@ -15,7 +15,11 @@ freeagent(node: 'smartos', slack: [channel: '#ops-ci']) {
     bundle.exec "rake build"
   }
 
-  gemReleaseStage(node: 'smartos', slack: [channel: '#ops-ci'])
+  if (env.BRANCH_NAME == "release-to-gemstash") {
+    stage('Gem Release') {
+      gemRelease(node: 'smartos', slack: [channel: '#ops-ci'])
+    }
+  }
 
   // WARNING: this includes a stage
   pruneRemoteBranches()
