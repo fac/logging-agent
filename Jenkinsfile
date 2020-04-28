@@ -17,7 +17,7 @@ freeagent(node: 'smartos', slack: [channel: '#ops-ci']) {
 
   if (env.BRANCH_NAME == "master") {
     stage('Gem Release') {
-      gemRelease(args)
+      gemRelease(node: 'smartos', slack: [channel: '#ops-ci'])
     }
   }
 
