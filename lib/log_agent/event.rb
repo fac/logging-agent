@@ -8,6 +8,7 @@ module LogAgent
     attr_accessor :source_type, :source_host, :source_path
     attr_accessor :tags, :fields
     attr_accessor :type, :message, :message_format, :timestamp, :captured_at
+    attr_reader :top_level_fields
 
     def self.reduce(events, &reducer)
       reducer ||= lambda do |messages|
@@ -16,15 +17,16 @@ module LogAgent
 
       first_event = events.first || LogAgent::Event.new
       LogAgent::Event.new({
-        :uuid        => first_event.uuid,
-        :source_host => first_event.source_host,
-        :source_type => first_event.source_type,
-        :source_path => first_event.source_path,
-        :tags        => first_event.tags,
-        :type        => first_event.type,
-        :timestamp   => first_event.timestamp,
-        :message     => reducer.call(events.map { |e| e.message }),
-        :fields      => events.inject({}) { |out,event| out.merge!(event.fields) }
+        :uuid             => first_event.uuid,
+        :source_host      => first_event.source_host,
+        :source_type      => first_event.source_type,
+        :source_path      => first_event.source_path,
+        :tags             => first_event.tags,
+        :type             => first_event.type,
+        :timestamp        => first_event.timestamp,
+        :message          => reducer.call(events.map { |e| e.message }),
+        :fields           => events.inject({}) { |out,event| out.merge!(event.fields) },
+        :top_level_fields => first_event.top_level_fields
       })
     end
 
@@ -41,6 +43,7 @@ module LogAgent
       @message_format = opts[:message_format] || nil
       @timestamp = opts[:timestamp] || Time.now
       @fields = opts[:fields] || {}
+      @top_level_fields = opts[:top_level_fields] || {}
       debug "Event '#{@uuid}' created"
     end
 
@@ -85,22 +88,23 @@ module LogAgent
         '@tags'         => self.tags,
         '@type'         => self.type,
         '@uuid'         => self.uuid
-      }).tap { |json| debug json }
+      }.merge(top_level_fields)).tap { |json| debug json }
     end
 
     def self.from_payload(json)
       data = JSON.load(json)
       new({
-        :timestamp    => (Time.parse(data['@timestamp']) rescue nil),
-        :captured_at  => (Time.parse(data['@captured_at']) rescue nil),
-        :source_host  => data['@source_host'],
-        :source_path  => data['@source_path'],
-        :source_type  => data['@source_type'],
-        :fields       => data['@fields'],
-        :message      => data['@message'],
-        :tags         => data['@tags'],
-        :type         => data['@type'],
-        :uuid         => data['@uuid']
+        :timestamp        => (Time.parse(data.delete('@timestamp')) rescue nil),
+        :captured_at      => (Time.parse(data.delete('@captured_at')) rescue nil),
+        :source_host      => data.delete('@source_host'),
+        :source_path      => data.delete('@source_path'),
+        :source_type      => data.delete('@source_type'),
+        :fields           => data.delete('@fields'),
+        :message          => data.delete('@message'),
+        :tags             => data.delete('@tags'),
+        :type             => data.delete('@type'),
+        :uuid             => data.delete('@uuid'),
+        :top_level_fields => data
       }).tap { |event| LogAgent.logger.debug "[Event] Loaded event '#{event.uuid}' object from json: #{json}" }
     end
   end

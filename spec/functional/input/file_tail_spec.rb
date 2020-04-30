@@ -129,6 +129,14 @@ describe LogAgent::Input::FileTail do
       }
       EM.add_timer(0.1) { logfile1.puts LogAgent::Event.new(:uuid => "1122334").to_payload; logfile1.flush }
     end
+    it "should pass through top level fields" do
+      sink.should_receive(:<<) { |event|
+        JSON.parse(event.to_payload)["foo"].should == 'bar'
+        done
+      }
+      EM.add_timer(0.1) { logfile1.puts ({ foo: "bar"}).to_json; logfile1.flush }
+    end
+
     it "should populate the message if the creation fails" do
       LogAgent.logger.should_receive(:warn)
       sink.should_receive(:<<) { |event|
