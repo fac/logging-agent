@@ -27,7 +27,8 @@ module LogAgent
         :timestamp        => first_event.timestamp,
         :message          => reducer.call(events.map { |e| e.message }),
         :fields           => events.inject({}) { |out,event| out.merge!(event.fields) },
-        :top_level_fields => first_event.top_level_fields
+        :top_level_fields => first_event.top_level_fields,
+        :op_id            => first_event.op_id
       })
     end
 
