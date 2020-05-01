@@ -26,6 +26,7 @@ module LogAgent::Filter
       if event.message =~ /^Completed (\d+) .* in (\d+(?:\.\d+)?)ms/
         event.fields['rails_status'] = $1.to_i
         event.fields['rails_duration']['total'] = $2.to_f
+        event.primary = true
       end
 
       if event.message =~ /^Completed .*Views: ([\d.]+)ms/

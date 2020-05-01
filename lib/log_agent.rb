@@ -30,6 +30,7 @@ module LogAgent
     autoload 'RailsLogTagParser',     'log_agent/filter/rails_log_tag_parser'
     autoload 'RailsOpIdParser',       'log_agent/filter/rails_op_id_parser'
     autoload 'MysqlSlow',             'log_agent/filter/mysql_slow'
+    autoload 'DelayedJob',            'log_agent/filter/delayed_job'
   end
   module Output
     autoload 'ElasticsearchRiver', 'log_agent/output/elasticsearch_river'
