@@ -9,6 +9,7 @@ module LogAgent
     attr_accessor :tags, :fields
     attr_accessor :type, :message, :message_format, :timestamp, :captured_at
     attr_reader :top_level_fields
+    attr_accessor :op_id
 
     def self.reduce(events, &reducer)
       reducer ||= lambda do |messages|
@@ -44,6 +45,7 @@ module LogAgent
       @timestamp = opts[:timestamp] || Time.now
       @fields = opts[:fields] || {}
       @top_level_fields = opts[:top_level_fields] || {}
+      @op_id = opts[:op_id]
       debug "Event '#{@uuid}' created"
     end
 
@@ -87,7 +89,8 @@ module LogAgent
         '@message'      => self.message,
         '@tags'         => self.tags,
         '@type'         => self.type,
-        '@uuid'         => self.uuid
+        '@uuid'         => self.uuid,
+        '@op_id'        => self.op_id
       }.merge(top_level_fields)).tap { |json| debug json }
     end
 

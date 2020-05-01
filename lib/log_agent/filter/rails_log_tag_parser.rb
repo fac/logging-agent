@@ -6,9 +6,9 @@ module LogAgent
       # Public: Read the list of configured tags
       #
       # Returns: A hash of the form:
-      #  
+      #
       #   { "tag" => "field_name", ... }
-      # 
+      #
       # where "tag" is the tag name in the log and "field_name" is the
       # name of the field in the log event. Even if the two are the same
       attr_reader :tags
