@@ -79,7 +79,7 @@ module LogAgent
 
     def to_payload
       debug "Dumping event '#{@uuid}' to payload:"
-      JSON.dump({
+      event = {
         '@timestamp'    => self.timestamp.iso8601(6),
         '@captured_at'  => self.captured_at.iso8601(6),
         '@source_type'  => self.source_type,
@@ -90,8 +90,11 @@ module LogAgent
         '@tags'         => self.tags,
         '@type'         => self.type,
         '@uuid'         => self.uuid,
-        '@op_id'        => self.op_id
-      }.merge(top_level_fields)).tap { |json| debug json }
+      }.merge(top_level_fields)
+
+      event["@op_id"] = self.op_id if self.op_id
+
+      JSON.dump(event).tap { |json| debug json }
     end
 
     def self.from_payload(json)

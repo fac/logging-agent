@@ -32,9 +32,19 @@ describe LogAgent::Filter::RailsOpIdParser do
       @event.message.should == "[other_tag=foo] A message"
     end
 
-    it  "should assign the tag value to the configured field" do
+    it "should assign the tag value to the configured field" do
       filter << LogAgent::Event.new(:message => "[other_tag=foo] [op=1234] [foo=value] A message")
       @event.op_id.should == "1234"
+    end
+
+    it "should dump the op id field if it is set" do
+      filter << LogAgent::Event.new(:message => "[other_tag=foo] [op=1234] [foo=value] A message")
+      JSON.load(@event.to_payload)["@op_id"].should == "1234"
+    end
+
+    it "should not dump the op id field if it is not set" do
+      filter << LogAgent::Event.new(:message => "[other_tag=foo] [foo=value] A message")
+      JSON.load(@event.to_payload).key?("@op_id").should == false
     end
   end
 end

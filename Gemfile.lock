@@ -1,11 +1,11 @@
 PATH
   remote: .
   specs:
-    log_agent (1.7.1)
+    log_agent (1.9.1)
       amq-protocol (= 1.9.2)
       amqp (~> 1.5.0)
       daemons (~> 1.1.8)
-      eventmachine (~> 1.2)
+      eventmachine (~> 1)
       eventmachine-tail (~> 0.6.3)
       json (~> 1.5.4)
       uuid (~> 2.3.5)
@@ -24,8 +24,8 @@ GEM
     eventmachine-tail (0.6.5)
       eventmachine
     json (1.5.5)
-    macaddr (1.7.1)
-      systemu (~> 2.6.2)
+    macaddr (1.7.2)
+      systemu (~> 2.6.5)
     rake (11.3.0)
     rspec (2.8.0)
       rspec-core (~> 2.8.0)
