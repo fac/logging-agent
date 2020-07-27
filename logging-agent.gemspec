@@ -20,7 +20,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'eventmachine', '~> 0.12.10'
   s.add_runtime_dependency 'amqp', '~> 1.5.0'
   s.add_runtime_dependency 'uuid', '~> 2.3.5'
-  s.add_runtime_dependency 'json', '~> 1.5.4'
+  s.add_runtime_dependency 'json', '>= 1.5.4', '< 2.4.0'
   s.add_runtime_dependency 'daemons', '~> 1.1.8'
   s.add_runtime_dependency 'eventmachine-tail', '~> 0.6.3'
   s.add_runtime_dependency 'amq-protocol', '1.9.2'
